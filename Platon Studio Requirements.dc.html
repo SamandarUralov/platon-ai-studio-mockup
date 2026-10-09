@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./doc-page.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+doc-page:not(:defined){visibility:hidden}
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1c1d2b;font-size:10.5pt;line-height:1.55}
+a{color:#3f4bd8}a:hover{color:#2a34a8}
+h1,h2,h3,h4{font-family:'IBM Plex Sans',sans-serif;color:#17182a;margin:0}
+h2{font-size:17pt;font-weight:700;margin:26pt 0 8pt;letter-spacing:-.01em}
+h3{font-size:12.5pt;font-weight:700;margin:16pt 0 5pt}
+h4{font-size:10.5pt;font-weight:700;margin:11pt 0 3pt}
+p{margin:0 0 7pt}
+ul,ol{margin:0 0 8pt;padding-left:16pt}
+li{margin:0 0 3pt}
+code{font-family:'JetBrains Mono',monospace;font-size:9pt;background:#f2f3f8;padding:0 3px;border-radius:3px}
+pre{font-family:'JetBrains Mono',monospace;font-size:8.6pt;line-height:1.5;background:#17182a;color:#e3e5f5;padding:9pt 11pt;border-radius:6px;margin:4pt 0 10pt;white-space:pre-wrap;break-inside:avoid}
+table{border-collapse:collapse;width:100%;margin:4pt 0 11pt;font-size:9.5pt}
+th{text-align:left;background:#f4f5f9;font-weight:600;color:#3a3c52;padding:5pt 7pt;border-bottom:1px solid #dcdde6}
+td{padding:5pt 7pt;border-bottom:1px solid #ececf2;vertical-align:top}
+tr{break-inside:avoid}
+</style>
+</helmet>
+<doc-page margin="0.75in">
+  <div style="border-bottom:2px solid #17182a;padding-bottom:14pt;margin-bottom:6pt">
+    <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4f5bea">Product &amp; technical requirements · v0.1 · October 7, 2026</div>
+    <h1 style="font-size:28pt;font-weight:700;letter-spacing:-.02em;margin:8pt 0 6pt">Platon AI Studio</h1>
+    <p style="font-size:12pt;color:#4a4c5e;margin:0">A visual, AI-assisted platform for teams to build business applications: interface, logic, data and storage, released safely across environments.</p>
+  </div>
+  <p style="font-size:9.5pt;color:#6b6d80">Audience: engineering team and product leads. Source: Studio prototype v3 (<code>Platon Studio v3.dc.html</code>). Sample app used throughout: <b>FieldOps Service Desk</b>.</p>
+
+  <h3 style="margin-top:12pt">Contents</h3>
+  <ol style="columns:2;column-gap:24pt">
+    <li>Product overview &amp; vision</li>
+    <li>Core concepts</li>
+    <li>Functional specification</li>
+    <li>Technical architecture</li>
+    <li>App definition (JSON schema)</li>
+    <li>API &amp; runtime specification</li>
+    <li>Non-functional requirements</li>
+    <li>Decisions to confirm</li>
+  </ol>
+
+  <h2>1. Product overview &amp; vision</h2>
+  <h3>Problem</h3>
+  <p>Operations teams run on spreadsheets, forms and ad-hoc scripts. Low-code tools help with screens but stall at real backend work: typed logic, queues, schedules, multiple databases, file storage and safe releases. Pure AI code generation is fast but produces code nobody on the team can review or maintain.</p>
+  <h3>Vision</h3>
+  <p>Platon AI Studio makes the whole application — <b>Interface, Logic, Data, Storage</b> — a single, versioned <b>app definition</b> that people edit visually and Studio AI edits through reviewable change plans. The same definition runs instantly on the Platon runtime, and can be exported as real code.</p>
+  <h3>Users</h3>
+  <table>
+    <thead><tr><th style="width:24%">Persona</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr><td><b>Builder</b> (ops lead, analyst)</td><td>Drag pages together, connect tables, set who sees what, preview as each role. Little or no code.</td></tr>
+      <tr><td><b>Platon developer</b></td><td>Typed functions, APIs, crons and queues; SQL console; Git and CI/CD; code export.</td></tr>
+      <tr><td><b>Admin / owner</b></td><td>Members, environments, credentials, releases to Production, audit.</td></tr>
+      <tr><td><b>App user</b></td><td>Uses the generated app (e.g. technicians, dispatchers). Never sees the Studio.</td></tr>
+    </tbody>
+  </table>
+  <h3>Product principles</h3>
+  <ul>
+    <li><b>Definition first.</b> Everything the Studio edits is structured data. Canvas, flowcharts, JSON view and AI all read and write the same model.</li>
+    <li><b>Structure ships, records stay.</b> Releases move structure (pages, schemas, functions, settings). Records, files, queue messages and run history never leave their environment.</li>
+    <li><b>AI proposes, people approve.</b> Studio AI produces change plans that are previewed and applied, never silent edits.</li>
+    <li><b>Typed end to end.</b> Function parameters, return values and API request/response shapes are declared, and connections between them are checked.</li>
+    <li><b>Plain language.</b> Labels like “Who can call it”, “Delete files after 7 days” over infrastructure jargon.</li>
+  </ul>
+
+  <h2>2. Core concepts</h2>
+  <table>
+    <thead><tr><th style="width:22%">Concept</th><th>Definition</th></tr></thead>
+    <tbody>
+      <tr><td><b>Organization</b></td><td>Tenant. Owns projects, members and billing.</td></tr>
+      <tr><td><b>Project / App</b></td><td>One application (e.g. FieldOps Service Desk). Switched from the top-bar app switcher.</td></tr>
+      <tr><td><b>App definition</b></td><td>Versioned JSON document describing the whole app (§5).</td></tr>
+      <tr><td><b>Layer</b></td><td>Top-level area of the Studio: Interface, Logic, Data, Storage (plus Preview and Releases).</td></tr>
+      <tr><td><b>Environment</b></td><td>Development, Staging, Production. Each has its own data, files, secrets and servers.</td></tr>
+      <tr><td><b>Change</b></td><td>One atomic edit to the definition with a human-readable text and a machine path, e.g. <code>~ logic.apis.post_work_orders.access</code>.</td></tr>
+      <tr><td><b>Draft / Save</b></td><td>Edits to a Logic item are a draft until saved (⌘S). Saved changes queue for the next release.</td></tr>
+      <tr><td><b>Release</b></td><td>A named, immutable snapshot of saved changes promoted to an environment (e.g. v1.4 → Production).</td></tr>
+      <tr><td><b>Role / Permission</b></td><td>App-level access (Admin, Dispatcher, Technician, Customer; permissions such as <code>work_orders.write</code>). Separate from Studio members.</td></tr>
+      <tr><td><b>Change plan</b></td><td>A set of proposed changes from Studio AI, shown as a diff the user applies or discards.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Functional specification</h2>
+  <h3>3.1 Studio shell</h3>
+  <ul>
+    <li><b>Top bar:</b> app switcher (search, recent apps, status, new app), layer tabs in order <i>Interface · Logic · Data · Storage · Preview · Releases</i>, environment and save status, profile menu (theme, language, logout), project settings.</li>
+    <li><b>Three-column layout</b> per layer: left navigator, center workspace, right inspector / Studio AI. Both side panels collapse to icon rails (⌘, and ⌘\ hide panels; full-screen toggle). Panels auto-collapse on narrow windows.</li>
+    <li><b>Change log</b>: every edit appends or updates a change entry (upsert by key) shown in Releases.</li>
+  </ul>
+
+  <h3>3.2 Interface layer</h3>
+  <ul>
+    <li><b>Left panel:</b> “UI elements” title, Page components list (blocks on the current page, click to select), search, element tiles grouped Text &amp; Layout, Data, etc. Add by drag-and-drop onto the canvas or double-click.</li>
+    <li><b>Canvas toolbar:</b> page picker (pages &amp; navigation), screen size presets and zoom, full-screen.</li>
+    <li><b>Canvas:</b> blocks placed in rows; drop targets left/right/above/below; reorder with up/down/left/right controls; selection outline.</li>
+    <li><b>Right panel:</b> properties of the selected element (Content, Style, Visibility sections). With nothing selected it shows the current page’s settings.</li>
+    <li><b>Pages:</b> create with icon, name, route, “show in menu”, and per-role permissions. Sample app uses a left sidebar menu that collapses on mobile.</li>
+    <li><b>UI element form modal:</b> name, icon picker, defaults. <i>Open item: sizing of the icon picker.</i></li>
+  </ul>
+
+  <h4>3.2.1 Page logic (Code mode)</h4>
+  <p>Every page has exactly one JavaScript file, its <b>page logic</b>. It owns the page’s client-side state, lifecycle hooks and handlers. Server work stays in the Logic layer; page logic calls it.</p>
+  <ul>
+    <li><b>Design / Code switch</b> in the canvas toolbar (next to Preview). Code replaces the canvas with the editor for the current page; the page picker switches files. Shortcut ⌘E.</li>
+    <li><b>Editor:</b> line numbers, syntax highlighting, autocomplete for <code>ctx.blocks.*</code> (blocks on this page), <code>ctx.data.*</code> (tables), <code>ctx.call()</code> (saved Logic functions and APIs), <code>ctx.state.*</code>. Find, fold, format on save.</li>
+    <li><b>Left panel in Code mode:</b> <i>Outline</i> (state, computed, hooks, handlers — click to jump), <i>Page blocks</i> (click to insert a reference), <i>Available logic</i> (functions and APIs with signatures).</li>
+    <li><b>Wiring is code only.</b> Handlers bind to blocks inside the file via <code>on: { 'ordersTable.rowClick': … }</code>; the inspector does not edit events. Block ids are stable, so renaming a block title does not break bindings.</li>
+    <li><b>Problems</b> strip under the editor: syntax errors, unknown block ids, unknown functions, wrong argument count, unused handlers. Release is blocked while errors exist.</li>
+    <li><b>Console</b> tab: <code>ctx.log()</code> output and runtime errors from Preview for this page, with role and timestamp.</li>
+    <li><b>Studio AI</b> in Code mode gets the file, the page’s blocks and Logic signatures as context and returns a diff to apply or discard.</li>
+    <li><b>Saving:</b> same as Logic — unsaved dot on the page, Discard · Save (⌘S). A save writes one change <code>~ interface.pages.{id}.script</code>.</li>
+    <li><b>Sandbox:</b> runs in the browser only, no DOM access, no <code>fetch</code>; network goes through <code>ctx.call()</code> so access rules from §3.3 always apply.</li>
+  </ul>
+  <pre>export default definePage({
+  state: { filter: 'open', selected: null },
+  computed: { overdue: (ctx) =&gt; ctx.blocks.ordersTable.rows.filter(r =&gt; r.slaDue &lt; Date.now()) },
+  async onLoad(ctx) { await ctx.blocks.ordersTable.load({ status: ctx.state.filter }) },
+  on: {
+    'statusFilter.change': (ctx, v) =&gt; { ctx.state.filter = v; ctx.blocks.ordersTable.reload() },
+    'assignBtn.click': async (ctx) =&gt; {
+      const tech = await ctx.call('assignNearestTech', ctx.state.selected.id)
+      ctx.toast('Assigned to ' + tech.name)
+    }
+  }
+})</pre>
+
+  <h3>3.3 Logic layer</h3>
+  <p>Left menu groups — <b>Functions, APIs, Crons, Message Queues</b> — each foldable, with item counts, status dots, unsaved-change markers and a hover “+” to create. A single search finds items across all four groups.</p>
+  <h4>Functions (method builder)</h4>
+  <ul>
+    <li>A function is an ordered tree of <b>layers</b>: <i>If, Switch, For each, Set variable, Return</i> (logic); <i>Select query, Execute query</i> (data); <i>HTTP request, MQ produce, MQ consume</i> (integrations); and <i>Function</i> (call another saved function).</li>
+    <li>Layers are added by drag-and-drop or double-click from the left “Method layers” palette (searchable), dropped into any branch (Then/Else, cases, loop body), reordered by drag or move up/down, duplicated and deleted. Return layers cannot be moved via buttons, duplicated or deleted.</li>
+    <li>Three views: <b>Builder</b>, <b>Flowchart</b> (auto-laid-out, branches side by side, click to select) and <b>JSON</b> (copyable).</li>
+    <li><b>Signature:</b> typed parameters (name, type, required) and a return type. <code>object</code> and <code>array&lt;object&gt;</code> types hold nested fields to any depth. Types: string, number, integer, boolean, date, datetime, enum, object, array&lt;…&gt;, file, any, <code>row&lt;table&gt;</code>, <code>array&lt;table&gt;</code>.</li>
+    <li><b>Return layer</b> returns either a <i>variable</i> (any value set earlier — parameters, query results, loop items, function results; the last function result is the default) or a <i>function call</i>. Its source type is checked against the declared return type; mismatches, missing required fields and wrong argument counts are errors shown in the panel and as a badge on the layer.</li>
+    <li>Right panel tabs: <b>Layer</b> (configure selected layer or method settings) and <b>AI assistant</b> (prompt to add layers).</li>
+  </ul>
+  <h4>APIs</h4>
+  <ul>
+    <li>An API is a trigger whose layers are function calls. Saved functions are listed and searchable in the left panel; drag or double-click to add.</li>
+    <li>Settings in collapsible sections: <b>Endpoint</b> (method, path with <code>:params</code>), <b>Access</b> (Public / Basic auth / Token; anyone authenticated or only selected roles and permissions), <b>Request · input</b> (tabs Path, Headers, Query, Body; content type; field name, type, required; nested objects; generated example), <b>Response · output</b> (fields per status code 200/400/401/403/500 and content type, generated example).</li>
+    <li>Tabs: <b>Problems</b> (live validation: missing functions, argument count, undeclared <code>input.x</code>, used-before-set, unused parameters, access misconfigurations), <b>Test</b> (fill parameters, send, see status, time and body), <b>Runs</b> (history with status, environment, latency), <b>History</b> (unreleased changes then audit trail).</li>
+  </ul>
+  <h4>Crons</h4>
+  <ul><li>Name, cron schedule, timezone, Pause/Resume, Run now; body is a list of function calls (same builder as APIs).</li></ul>
+  <h4>Message queues</h4>
+  <ul>
+    <li>A queue is a channel between functions. <b>Flow</b> tab: Published by (auto-detected from MQ produce layers) → Queue (message fields) → Processed by (consumer functions, drag to attach). Dead-letter summary with Replay all.</li>
+    <li><b>Messages</b> tab: recent messages with status (Waiting, Delivered, Retrying, Dead-letter), attempts, contents, Replay/Delete. <b>Settings</b>: message fields, concurrency, retries, backoff, time limit, in-order delivery.</li>
+  </ul>
+  <h4>Saving</h4>
+  <p>Each Logic item tracks a snapshot on first edit. Header shows “Unsaved changes · Discard · Save” (⌘S). Discard restores the snapshot and removes its pending changes.</p>
+
+  <h3>3.4 Data layer</h3>
+  <ul>
+    <li>Multiple database connections per app: PostgreSQL, MySQL, SQL Server, MongoDB, Redis. Connection form with test; credentials per environment.</li>
+    <li>Tables/collections with typed fields, relations and a relationship diagram; DDL view per dialect.</li>
+    <li>Test-data generation, SQL console (scoped to Development by default), record browsing.</li>
+    <li>Schema changes become migrations in releases; records never move between environments.</li>
+  </ul>
+
+  <h3>3.5 Storage layer</h3>
+  <ul>
+    <li><b>Object storage (MinIO / S3-compatible):</b> connect any number of services (endpoint, region, TLS, keys per environment, test, disconnect). Buckets with purpose, objects, size, access (Private / Signed URLs / Public read) and versioning. Bucket file browser: upload, download, signed link, delete. “Used by” shows fields and functions that reference it.</li>
+    <li><b>Local storage:</b> the app server’s filesystem under a root (e.g. <code>/var/platon/fieldops</code> on Ubuntu). Only declared folders are reachable. Per folder: size limit, function access (none / read / read &amp; write), cleanup rule, nightly backup to object storage, file browser. Disk usage and a non-replication warning.</li>
+    <li>Functions address files as <code>s3://{storage}/{bucket}/…</code> or <code>local://{folder}/…</code>. <i>Storage layers for the builder (upload, read, delete, signed URL) are planned.</i></li>
+  </ul>
+
+  <h3>3.6 Preview</h3>
+  <p>Runs the app with Development data as a chosen role. Page and element visibility rules apply. Device sizes match the canvas presets.</p>
+
+  <h3>3.7 Releases &amp; environments</h3>
+  <ul>
+    <li>Pending changes list grouped by area (Pages, Logic, Database, Storage, Settings) with machine paths.</li>
+    <li>Create release (name, notes) → deploy to Development → Staging → Production; approval gate for Production; rollback to a previous release.</li>
+    <li>Release contents: definition diff, generated DB migrations, storage/bucket/folder provisioning. Never records, files, messages or run history.</li>
+  </ul>
+
+  <h3>3.8 Project settings</h3>
+  <table>
+    <thead><tr><th style="width:20%">Page</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td>General</td><td>Name, slug/address, default language and timezone.</td></tr>
+      <tr><td>Members</td><td>Studio users and Studio roles (Owner, Admin, Editor, Viewer); invite, remove.</td></tr>
+      <tr><td>Workflows</td><td>Status machines for records (states, transitions, who can move them).</td></tr>
+      <tr><td>Translations</td><td>App languages; key table with missing-translation counts; AI translate.</td></tr>
+      <tr><td>Git</td><td>Connect a repository; branch; code export target.</td></tr>
+      <tr><td>CI/CD</td><td>Pipeline stages (validate, tests, staging, approval, production), trigger, run history, environment variables and secrets.</td></tr>
+      <tr><td>Agent.md</td><td>Project instructions for Studio AI (edit / preview).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.9 Studio AI</h3>
+  <ul>
+    <li>Right-side panel in every layer, chat with history grouped by date, <code>/</code> command shortcuts, context-usage ring, chips for attached context (selected element, page, function).</li>
+    <li>Outputs <b>change plans</b> (pending → applied / discarded). In Logic, the assistant adds layers, attaches consumers or creates APIs; changes count as unsaved until saved.</li>
+    <li>Models: Claude and GPT via provider adapters, other models and local agents via MCP (§4.4).</li>
+  </ul>
+
+  <h2 style="break-before:page">4. Technical architecture</h2>
+  <h3>4.1 Stack</h3>
+  <p>The chosen stack — <b>Vue</b> frontend and <b>Spring Boot (Java)</b> backend — fits well. Recommended specifics:</p>
+  <table>
+    <thead><tr><th style="width:22%">Area</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td>Studio frontend</td><td>Vue 3 (Composition API) + TypeScript, Vite, Pinia, Vue Router, VueUse. Monaco for code/SQL/JSON. ELK.js for flowchart and ER layout. Own component library from the prototype’s tokens.</td></tr>
+      <tr><td>Generated app frontend</td><td>Vue 3 renderer that interprets page definitions; same renderer used by Preview.</td></tr>
+      <tr><td>Backend</td><td>Spring Boot 3.3+, <b>Java 21</b> (virtual threads), Spring Security (OIDC resource server), Spring WebSocket, Flyway, jOOQ for multi-dialect SQL and DDL generation, Testcontainers for tests.</td></tr>
+      <tr><td>Identity</td><td>Keycloak (or any OIDC provider) for Studio users; per-app user pools for runtime auth.</td></tr>
+      <tr><td>Platform DB</td><td>PostgreSQL 16 (definitions as JSONB + relational metadata).</td></tr>
+      <tr><td>Messaging</td><td>RabbitMQ default (native DLQ, retries, ordering via single-active consumer); Kafka adapter optional.</td></tr>
+      <tr><td>Scheduling</td><td>Quartz in clustered JDBC mode (or db-scheduler).</td></tr>
+      <tr><td>Cache / presence</td><td>Redis.</td></tr>
+      <tr><td>Storage</td><td>MinIO Java SDK (S3 API); local-filesystem agent on app servers.</td></tr>
+      <tr><td>Secrets</td><td>HashiCorp Vault (SaaS); Kubernetes secrets or Vault for self-hosted.</td></tr>
+      <tr><td>Observability</td><td>OpenTelemetry, Prometheus, Grafana, Loki/Tempo.</td></tr>
+      <tr><td>Deploy</td><td>Kubernetes + Helm (SaaS and enterprise self-hosted); Docker Compose for small self-hosted installs.</td></tr>
+    </tbody>
+  </table>
+  <p><b>Additional recommendations:</b> define the app definition as JSON Schema and generate both TypeScript types (frontend) and Java records (backend) from it, so the model never drifts. Use a sandboxed expression language (<b>CEL</b>) for conditions, arguments and values instead of SpEL or JavaScript. Kotlin is a reasonable alternative to Java if the team prefers it; it changes nothing else here.</p>
+
+  <h3>4.2 Services</h3>
+  <table>
+    <thead><tr><th style="width:24%">Service</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><b>Studio Web</b></td><td>Vue SPA for all layers, Preview and settings.</td></tr>
+      <tr><td><b>Studio API</b></td><td>Projects, members, definitions, changes, saves, releases, validation, test runs. REST + WebSocket.</td></tr>
+      <tr><td><b>Definition Store</b></td><td>Versioned definition documents, change log, release snapshots (inside Studio API, PostgreSQL).</td></tr>
+      <tr><td><b>Validator</b></td><td>Type checker for functions, APIs, crons, queues and return paths; produces Problems.</td></tr>
+      <tr><td><b>Runtime</b></td><td>Per environment: serves the generated app, executes functions, exposes APIs, runs crons and queue consumers.</td></tr>
+      <tr><td><b>Connector workers</b></td><td>Database drivers, MinIO, local FS agent, HTTP egress.</td></tr>
+      <tr><td><b>AI Gateway</b></td><td>Model adapters, MCP server and client, context assembly, change-plan generation, token accounting.</td></tr>
+      <tr><td><b>Release &amp; CI service</b></td><td>Builds release bundles, migrations, provisioning, pipeline runs, code export to Git (JGit).</td></tr>
+    </tbody>
+  </table>
+  <pre>Studio Web ──REST/WS──▶ Studio API ──▶ PostgreSQL (definitions, changes, releases)
+     │                      │  ├─▶ Validator
+     │                      │  ├─▶ AI Gateway ──▶ Claude · GPT · MCP servers · local agents
+     │                      │  └─▶ Release &amp; CI ──▶ Git · Runtime(env)
+     ▼                      ▼
+ Preview ◀──────────── Runtime (Dev / Staging / Prod)
+                          ├─▶ App DBs (Postgres, MySQL, SQL Server, Mongo, Redis)
+                          ├─▶ RabbitMQ · Quartz
+                          └─▶ MinIO / S3 · local folders</pre>
+
+  <h3>4.3 Execution model (hybrid)</h3>
+  <ul>
+    <li><b>Interpreted (default):</b> the Runtime loads the released definition and interprets pages, function layer trees, APIs, crons and queues. Deploys are definition swaps — seconds, no build.</li>
+    <li><b>Code export:</b> the Release service generates a readable Spring Boot + Vue project (templates via JTE), commits it to the connected Git repo and can run it through CI/CD. Export is one-way; re-importing hand-edited code is out of scope for v1.</li>
+    <li>Both paths share the same validator so behaviour and errors match.</li>
+  </ul>
+
+  <h3>4.4 AI integration</h3>
+  <ul>
+    <li><b>Providers:</b> adapters for Anthropic Claude and OpenAI GPT behind one interface (chat, tool use, streaming). Organization chooses default model; per-feature overrides.</li>
+    <li><b>MCP server:</b> the Studio exposes tools to any model or local agent: <code>read_definition</code>, <code>search_definition</code>, <code>propose_changes</code>, <code>validate</code>, <code>run_function_test</code>, <code>run_sql_dev</code>, <code>generate_test_data</code>.</li>
+    <li><b>MCP client:</b> projects can add external MCP servers (docs, ticketing, internal tools) the assistant may call.</li>
+    <li><b>Local agents:</b> developers connect local agents (e.g. coding agents on their machine) via MCP with a personal token scoped to one project and environment.</li>
+    <li><b>Safety:</b> AI writes only through <code>propose_changes</code>; plans are validated and shown before applying. Production data is never sent to models; SQL tools are limited to Development. Agent.md is included as project context.</li>
+  </ul>
+
+  <h3>4.5 Real-time collaboration</h3>
+  <p>Edits are sent as change operations against a definition revision. The server applies them in order, rejects conflicting ops on the same node (client re-bases) and broadcasts to other editors over WebSocket. Presence (who is viewing which page or function) lives in Redis. Logic items lock softly while someone has unsaved changes.</p>
+
+  <h2>5. App definition (JSON schema)</h2>
+  <p>One document per project revision. Ids are stable snake_case; references use ids, not names.</p>
+  <pre>{
+  "id": "fieldops", "name": "FieldOps Service Desk", "version": 142,
+  "settings": { "defaultLanguage": "en", "timezone": "America/Los_Angeles", "languages": ["en","es"] },
+  "roles": [{ "id": "dispatcher", "name": "Dispatcher", "permissions": ["work_orders.write"] }],
+  "interface": { "navigation": { "type": "sidebar" }, "pages": [ … ] },
+  "data":      { "connections": [ … ], "tables": [ … ] },
+  "logic":     { "functions": [ … ], "apis": [ … ], "crons": [ … ], "queues": [ … ] },
+  "storage":   { "object": [ … ], "local": { "root": "/var/platon/fieldops", "folders": [ … ] } },
+  "workflows": [ … ], "translations": { … }
+}</pre>
+  <h4>Page &amp; block</h4>
+  <pre>{ "id": "orders", "name": "Work orders", "icon": "clipboard-list", "route": "/orders", "inMenu": true,
+  "visibleTo": ["admin","dispatcher"],
+  "script": { "lang": "js", "file": "pages/orders.page.js", "source": "export default definePage({ … })",
+    "bindings": ["statusFilter.change", "assignBtn.click"], "calls": ["assignNearestTech"] },
+  "blocks": [{ "id": "b3", "type": "data_table", "title": "All work orders", "row": 2,
+    "props": { "source": "data.work_orders", "columns": ["id","status","priority"] },
+    "visibility": { "roles": ["admin","dispatcher"] } }] }</pre>
+  <h4>Typed field (used by params, returns, request, response, message fields)</h4>
+  <pre>{ "name": "order", "type": "object", "req": true,
+  "fields": [{ "name": "id", "type": "string", "req": true },
+             { "name": "site", "type": "row&lt;sites&gt;", "req": false }] }</pre>
+  <h4>Function</h4>
+  <pre>{ "id": "assign_nearest_tech", "name": "assignNearestTech", "timeout": "30 s",
+  "params": [{ "name": "order_id", "type": "string", "req": true }],
+  "returns": { "type": "object", "fields": [{ "name": "assigned", "type": "boolean", "req": true }] },
+  "steps": [
+    { "id": "s1", "type": "select", "table": "technicians", "where": "on_shift = true", "limit": "50", "into": "techs" },
+    { "id": "s2", "type": "if", "condition": "size(techs) == 0",
+      "then": [ { "id": "s3", "type": "return", "from": "fn", "fn": "notifyNoTech", "args": "input.order_id" } ],
+      "else": [ { "id": "s4", "type": "call", "fn": "pickNearest", "args": "techs, input.order_id", "into": "result" } ] },
+    { "id": "s5", "type": "return", "from": "var", "var": "result" } ] }</pre>
+  <p>Step types: <code>if</code> (then/else), <code>switch</code> (value, cases{}, default), <code>for</code> (list, as, do), <code>set</code>, <code>return</code> (from var|fn), <code>select</code>, <code>execute</code>, <code>http</code>, <code>produce</code>, <code>consume</code>, <code>call</code>.</p>
+  <h4>API, cron, queue</h4>
+  <pre>{ "id": "post_work_orders", "method": "POST", "path": "/api/work-orders",
+  "access": { "type": "token", "who": "roles", "roles": ["Dispatcher","Admin"], "perms": [] },
+  "request":  { "contentType": "application/json", "path": [], "headers": [], "query": [], "body": [ …fields ] },
+  "responses": { "200": { "contentType": "application/json", "fields": [ … ] }, "400": { … } },
+  "steps": [ { "id": "s1", "type": "call", "fn": "createWorkOrder", "args": "input.site_id, …", "into": "order" } ] }
+
+{ "id": "nightly_sla", "name": "Nightly SLA check", "schedule": "0 2 * * *", "timezone": "America/Los_Angeles", "enabled": true, "steps": [ … ] }
+
+{ "id": "work_order_events", "name": "work-order-events", "fields": [ …fields ], "consumers": ["handleOrderEvents"],
+  "settings": { "concurrency": 5, "retries": 3, "backoff": "exponential", "timeout": "30 s", "ordered": false } }</pre>
+  <h4>Storage</h4>
+  <pre>{ "object": [{ "id": "field_files", "provider": "minio", "purpose": "files", "endpoint": "https://minio…:9000",
+     "region": "us-west-1", "tls": true, "credentials": { "development": "secret://field_files/development" },
+     "buckets": [{ "name": "fieldops-photos", "access": "private", "versioning": true }] }],
+  "local": { "root": "/var/platon/fieldops", "folders": [{ "id": "uploads", "path": "uploads",
+     "quota": "5 GB", "access": "rw", "cleanup": "7d", "backup": { "enabled": true, "target": "backups" } }] } }</pre>
+  <h4>Change &amp; release</h4>
+  <pre>{ "id": "chg_8f21", "key": "api.post_work_orders.access.type", "area": "Logic", "author": "maya@acme",
+  "text": "Set access to Token on POST /api/work-orders", "op": "replace",
+  "path": "/logic/apis/post_work_orders/access/type", "value": "token", "baseVersion": 141 }
+
+{ "id": "rel_v1_5", "name": "v1.5", "fromVersion": 128, "toVersion": 142, "changes": ["chg_…"],
+  "migrations": ["V142__add_sla_due.sql"], "deployments": [{ "env": "staging", "status": "succeeded" }] }</pre>
+  <p>Changes are JSON Patch operations (RFC 6902) plus metadata; secrets are only ever <code>secret://</code> references.</p>
+
+  <h2 style="break-before:page">6. API &amp; runtime specification</h2>
+  <h3>6.1 Studio API (REST, <code>/api/v1</code>)</h3>
+  <table>
+    <thead><tr><th style="width:46%">Endpoint</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET/POST /projects</code>, <code>GET/PATCH/DELETE /projects/{id}</code></td><td>Projects, app switcher.</td></tr>
+      <tr><td><code>GET /projects/{id}/definition?version=</code></td><td>Full or partial (<code>?paths=logic.apis</code>) definition.</td></tr>
+      <tr><td><code>POST /projects/{id}/changes</code></td><td>Apply change ops with <code>baseVersion</code>; 409 on conflict.</td></tr>
+      <tr><td><code>POST /projects/{id}/logic/{kind}/{itemId}:save</code> · <code>:discard</code></td><td>Save or discard a Logic draft.</td></tr>
+      <tr><td><code>POST /projects/{id}/validate</code></td><td>Problems for whole project or one item.</td></tr>
+      <tr><td><code>POST /projects/{id}/logic/functions/{fid}:test</code> · <code>apis/{aid}:test</code></td><td>Test run in Development with inputs; returns status, timing, output, trace.</td></tr>
+      <tr><td><code>GET /projects/{id}/logic/apis/{aid}/runs</code> · <code>/history</code></td><td>Run history, change history.</td></tr>
+      <tr><td><code>GET/POST /projects/{id}/queues/{qid}/messages</code>, <code>:replay</code></td><td>Inspect, send test, replay, delete messages (per environment).</td></tr>
+      <tr><td><code>/projects/{id}/data/connections</code>, <code>/tables</code>, <code>/sql</code>, <code>/test-data</code></td><td>Data layer, console (Development only by default).</td></tr>
+      <tr><td><code>/projects/{id}/storage/object</code>, <code>/buckets/{b}/files</code>, <code>/local/folders/{f}/files</code></td><td>Storage config and file browsing per environment.</td></tr>
+      <tr><td><code>GET/POST /projects/{id}/releases</code>, <code>POST /releases/{rid}:deploy?env=</code>, <code>:rollback</code></td><td>Releases and deployments.</td></tr>
+      <tr><td><code>/projects/{id}/members</code>, <code>/settings/*</code>, <code>/git</code>, <code>/cicd/runs</code></td><td>Settings pages.</td></tr>
+      <tr><td><code>POST /projects/{id}/ai/conversations/{cid}/messages</code> (SSE stream)</td><td>Studio AI chat; returns messages and change plans.</td></tr>
+      <tr><td><code>POST /projects/{id}/ai/plans/{pid}:apply</code> · <code>:discard</code></td><td>Apply or discard an AI change plan.</td></tr>
+      <tr><td><code>WS /ws/projects/{id}</code></td><td>Change broadcasts, presence, run/log streaming.</td></tr>
+    </tbody>
+  </table>
+  <p>All endpoints: OIDC bearer token, Studio role checks, JSON error body <code>{ "error": "code", "message": "…", "details": [] }</code>, request id header, idempotency keys on POST.</p>
+
+  <h3>6.2 Runtime: generated APIs</h3>
+  <ul>
+    <li>Base URL <code>https://{slug}.{env}.platon.app</code> (SaaS) or the customer’s host (self-hosted).</li>
+    <li>Pipeline per request: route → <b>access</b> (public / basic / bearer token; role or permission check → 401/403) → <b>validation</b> against request schema (path, headers, query, body; required and types → 400 with <code>missing</code>/<code>invalid</code>) → execute steps → shape response to the declared status schema → log run.</li>
+    <li>Errors in steps return 500 <code>{ "error": "runtime_error", "step": "s3", "message": … }</code>; function timeouts return 504.</li>
+    <li>Rate limits per API and per token; CORS configured per app.</li>
+  </ul>
+
+  <h3>6.3 Runtime: function execution</h3>
+  <ul>
+    <li>Interpreter walks the step tree with a scoped context: <code>input</code> (validated parameters), variables set by <code>into</code>/<code>set</code>/loops, <code>env</code>, <code>user</code>, read-only <code>secrets</code>.</li>
+    <li>Expressions (conditions, args, values) use CEL; no arbitrary code. SQL in <code>select/execute</code> is parameterised from <code>:name</code> bindings only.</li>
+    <li>Limits per run: timeout (declared), max steps, max loop iterations, memory, HTTP egress allowlist per app.</li>
+    <li>Every run produces a trace (step, duration, inputs/outputs truncated) for Test and Runs.</li>
+  </ul>
+
+  <h3>6.4 Runtime: crons &amp; queues</h3>
+  <ul>
+    <li>Crons: Quartz cluster, one execution per schedule across nodes, missed-fire policy “run once”, pause/resume per environment.</li>
+    <li>Queues: RabbitMQ exchange + queue per definition queue and environment; consumers are functions; retries with fixed or exponential backoff then dead-letter queue; in-order option uses a single active consumer; message schema validated on produce.</li>
+  </ul>
+
+  <h3>6.5 Runtime: storage</h3>
+  <ul>
+    <li>Object storage via S3 API: private by default, signed URLs (default 1 hour), public read only when set on the bucket.</li>
+    <li>Local folders via an agent on each app server: path confinement to declared folders, quota enforcement, cleanup job, nightly backup to the configured object storage.</li>
+  </ul>
+
+  <h2>7. Non-functional requirements</h2>
+  <h3>7.1 Performance &amp; scale</h3>
+  <table>
+    <thead><tr><th style="width:46%">Requirement</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td>Concurrent Studio users (platform)</td><td>500–1,000 active, horizontally scalable beyond</td></tr>
+      <tr><td>Concurrent editors on one project</td><td>≥ 20 with live presence</td></tr>
+      <tr><td>Studio API read latency (definition, lists)</td><td>p95 &lt; 200 ms</td></tr>
+      <tr><td>Change apply + broadcast to other editors</td><td>p95 &lt; 300 ms</td></tr>
+      <tr><td>Validation of one function / API</td><td>&lt; 150 ms (runs on every edit)</td></tr>
+      <tr><td>Canvas and builder interactions</td><td>60 fps with 200 blocks per page or 300 layers per function</td></tr>
+      <tr><td>Studio AI first token</td><td>&lt; 2 s; plans for typical requests &lt; 15 s</td></tr>
+      <tr><td>Definition deploy to an environment (interpreted)</td><td>&lt; 30 s</td></tr>
+      <tr><td>Studio initial load</td><td>&lt; 2.5 s on broadband; JS bundle split per layer</td></tr>
+    </tbody>
+  </table>
+  <h3>7.2 Availability &amp; recovery</h3>
+  <ul>
+    <li>SaaS Studio and runtime: 99.9% monthly. Zero-downtime deploys of the platform.</li>
+    <li>Platform DB: point-in-time recovery; RPO ≤ 15 min, RTO ≤ 1 h. Release rollback ≤ 2 min.</li>
+    <li>Self-hosted: HA Helm profile (≥ 2 replicas per service) and single-node Compose profile.</li>
+  </ul>
+  <h3>7.3 Security</h3>
+  <ul>
+    <li>Tenant isolation: organization id on every row, row-level security in PostgreSQL; per-environment runtime namespaces.</li>
+    <li>Studio roles (Owner, Admin, Editor, Viewer); Production deploy and secrets restricted to Admin/Owner.</li>
+    <li>Secrets in Vault, referenced only by <code>secret://</code>; never returned to the browser after save (masked, rotate only).</li>
+    <li>Sandboxed execution: CEL expressions, parameterised SQL, egress allowlist, resource limits; no user-supplied code in v1.</li>
+    <li>Audit log for every change, save, release, deploy, secret access and AI plan application.</li>
+    <li>TLS everywhere; encryption at rest for platform DB and object storage.</li>
+    <li>AI: no Production records or secrets in prompts; per-org opt-out of model providers; local-agent tokens scoped and revocable.</li>
+    <li>No compliance certification required yet; keep data model GDPR-ready (export, delete, data residency per region).</li>
+  </ul>
+  <h3>7.4 Other</h3>
+  <ul>
+    <li><b>Observability:</b> traces across Studio API → Runtime → connectors; per-app dashboards (requests, errors, latency, queue depth, cron runs).</li>
+    <li><b>Internationalization:</b> Studio UI and generated apps localized; Studio ships in English first.</li>
+    <li><b>Accessibility:</b> WCAG 2.1 AA for the generated apps; keyboard support for the Studio canvas and builder.</li>
+    <li><b>Browsers:</b> latest two versions of Chrome, Edge, Firefox, Safari; Studio desktop-first (≥ 1024 px), generated apps responsive.</li>
+    <li><b>Testing:</b> JSON Schema contract tests between frontend and backend; interpreter golden tests per step type; Testcontainers for each database dialect.</li>
+  </ul>
+
+  <h2>8. Decisions to confirm</h2>
+  <ul>
+    <li>RabbitMQ as the default broker, with Kafka as an optional adapter.</li>
+    <li>CEL as the expression language for conditions and arguments.</li>
+    <li>Code export is one-way in v1.</li>
+    <li>Billing and plan limits (projects, environments, runs) are not covered here.</li>
+    <li>Whether self-hosted installs may use external AI providers or only local models.</li>
+  </ul>
+</doc-page>
+</x-dc>
+</body>
+</html>

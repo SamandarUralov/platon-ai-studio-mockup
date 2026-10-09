@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<script src="./doc-page.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+doc-page:not(:defined){visibility:hidden}
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1c1d2b;font-size:10.5pt;line-height:1.55}
+a{color:#3f4bd8}a:hover{color:#2a34a8}
+h1,h2,h3,h4{font-family:'IBM Plex Sans',sans-serif;color:#17182a;margin:0}
+h2{font-size:17pt;font-weight:700;margin:26pt 0 8pt;letter-spacing:-.01em}
+h3{font-size:12.5pt;font-weight:700;margin:16pt 0 5pt}
+h4{font-size:10.5pt;font-weight:700;margin:11pt 0 3pt}
+p{margin:0 0 7pt}
+ul,ol{margin:0 0 8pt;padding-left:16pt}
+li{margin:0 0 3pt}
+code{font-family:'JetBrains Mono',monospace;font-size:9pt;background:#f2f3f8;padding:0 3px;border-radius:3px}
+pre{font-family:'JetBrains Mono',monospace;font-size:8.6pt;line-height:1.5;background:#17182a;color:#e3e5f5;padding:9pt 11pt;border-radius:6px;margin:4pt 0 10pt;white-space:pre-wrap;break-inside:avoid}
+table{border-collapse:collapse;width:100%;margin:4pt 0 11pt;font-size:9.5pt}
+th{text-align:left;background:#f4f5f9;font-weight:600;color:#3a3c52;padding:5pt 7pt;border-bottom:1px solid #dcdde6}
+td{padding:5pt 7pt;border-bottom:1px solid #ececf2;vertical-align:top}
+tr{break-inside:avoid}
+</style>
+</helmet>
+<doc-page margin="0.75in">
+  <div style="border-bottom:2px solid #17182a;padding-bottom:14pt;margin-bottom:6pt">
+    <div style="font-size:9pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4f5bea">Mahsulot va texnik talablar · v0.1 · 2026-yil 7-oktabr</div>
+    <h1 style="font-size:28pt;font-weight:700;letter-spacing:-.02em;margin:8pt 0 6pt">Platon AI Studio</h1>
+    <p style="font-size:12pt;color:#4a4c5e;margin:0">Jamoalar biznes ilovalarini yaratishi uchun vizual, sunʼiy intellekt yordamidagi platforma: interfeys, mantiq, maʼlumotlar va saqlash — muhitlar boʻylab xavfsiz relizlar bilan.</p>
+  </div>
+  <p style="font-size:9.5pt;color:#6b6d80">Auditoriya: muhandislar jamoasi va mahsulot rahbarlari. Manba: Studio prototipi v3 (<code>Platon Studio v3.dc.html</code>). Hujjat davomida misol ilova: <b>FieldOps Service Desk</b>.</p>
+
+  <h3 style="margin-top:12pt">Mundarija</h3>
+  <ol style="columns:2;column-gap:24pt">
+    <li>Mahsulot haqida umumiy maʼlumot va maqsad</li>
+    <li>Asosiy tushunchalar</li>
+    <li>Funksional spetsifikatsiya</li>
+    <li>Texnik arxitektura</li>
+    <li>Ilova taʼrifi (JSON sxema)</li>
+    <li>API va runtime spetsifikatsiyasi</li>
+    <li>Nofunksional talablar</li>
+    <li>Tasdiqlanishi kerak boʻlgan qarorlar</li>
+  </ol>
+
+  <h2>1. Mahsulot haqida umumiy maʼlumot va maqsad</h2>
+  <h3>Muammo</h3>
+  <p>Operatsion jamoalar jadvallar, shakllar va tasodifiy skriptlar bilan ishlaydi. Low-code vositalar ekranlarni yaratishda yordam beradi, lekin haqiqiy backend ishida toʻxtab qoladi: tiplangan mantiq, navbatlar, jadvallar boʻyicha vazifalar, bir nechta maʼlumotlar bazasi, fayllarni saqlash va xavfsiz relizlar. Faqat sunʼiy intellekt bilan kod yaratish tez, lekin jamoadagi hech kim koʻrib chiqa olmaydigan va qoʻllab-quvvatlay olmaydigan kod hosil qiladi.</p>
+  <h3>Maqsad</h3>
+  <p>Platon AI Studio butun ilovani — <b>Interfeys, Mantiq, Maʼlumotlar, Saqlash</b> — yagona, versiyalangan <b>ilova taʼrifiga</b> aylantiradi. Odamlar uni vizual tahrirlaydi, Studio AI esa koʻrib chiqiladigan oʻzgarishlar rejasi orqali tahrirlaydi. Xuddi shu taʼrif Platon runtime’da darhol ishga tushadi va haqiqiy kod sifatida eksport qilinishi mumkin.</p>
+  <h3>Foydalanuvchilar</h3>
+  <table>
+    <thead><tr><th style="width:24%">Persona</th><th>Ehtiyojlar</th></tr></thead>
+    <tbody>
+      <tr><td><b>Quruvchi</b> (operatsion rahbar, tahlilchi)</td><td>Sahifalarni sudrab yigʻish, jadvallarni ulash, kim nimani koʻrishini belgilash, har bir rol nomidan oldindan koʻrish. Kod deyarli yoki umuman kerak emas.</td></tr>
+      <tr><td><b>Platon dasturchisi</b></td><td>Tiplangan funksiyalar, API’lar, cron’lar va navbatlar; SQL konsol; Git va CI/CD; kod eksporti.</td></tr>
+      <tr><td><b>Administrator / egasi</b></td><td>Aʼzolar, muhitlar, kirish maʼlumotlari, Production’ga relizlar, audit.</td></tr>
+      <tr><td><b>Ilova foydalanuvchisi</b></td><td>Yaratilgan ilovadan foydalanadi (masalan, texniklar, dispetcherlar). Studio’ni hech qachon koʻrmaydi.</td></tr>
+    </tbody>
+  </table>
+  <h3>Mahsulot tamoyillari</h3>
+  <ul>
+    <li><b>Avval taʼrif.</b> Studio tahrirlaydigan hamma narsa tuzilmali maʼlumotdir. Kanvas, blok-sxemalar, JSON koʻrinishi va AI bir xil modelni oʻqiydi va yozadi.</li>
+    <li><b>Tuzilma koʻchadi, yozuvlar qoladi.</b> Relizlar tuzilmani (sahifalar, sxemalar, funksiyalar, sozlamalar) koʻchiradi. Yozuvlar, fayllar, navbat xabarlari va ishga tushirish tarixi oʻz muhitidan hech qachon chiqmaydi.</li>
+    <li><b>AI taklif qiladi, odamlar tasdiqlaydi.</b> Studio AI oʻzgarishlar rejasini tuzadi; ular oldindan koʻrib chiqiladi va qoʻllaniladi, hech qachon jimgina tahrirlanmaydi.</li>
+    <li><b>Boshidan oxirigacha tiplangan.</b> Funksiya parametrlari, qaytariladigan qiymatlar va API soʻrov/javob shakllari eʼlon qilinadi, ular orasidagi bogʻlanishlar tekshiriladi.</li>
+    <li><b>Oddiy til.</b> Infratuzilma jargonidan koʻra “Kim chaqira oladi”, “Fayllarni 7 kundan keyin oʻchirish” kabi yozuvlar.</li>
+  </ul>
+
+  <h2>2. Asosiy tushunchalar</h2>
+  <table>
+    <thead><tr><th style="width:22%">Tushuncha</th><th>Taʼrif</th></tr></thead>
+    <tbody>
+      <tr><td><b>Tashkilot</b></td><td>Tenant. Loyihalar, aʼzolar va toʻlovlarga egalik qiladi.</td></tr>
+      <tr><td><b>Loyiha / Ilova</b></td><td>Bitta ilova (masalan, FieldOps Service Desk). Yuqori paneldagi ilova almashtirgichdan tanlanadi.</td></tr>
+      <tr><td><b>Ilova taʼrifi</b></td><td>Butun ilovani tavsiflovchi versiyalangan JSON hujjat (§5).</td></tr>
+      <tr><td><b>Qatlam</b></td><td>Studio’ning yuqori darajadagi boʻlimi: Interfeys, Mantiq, Maʼlumotlar, Saqlash (shuningdek Oldindan koʻrish va Relizlar).</td></tr>
+      <tr><td><b>Muhit</b></td><td>Development, Staging, Production. Har birining oʻz maʼlumotlari, fayllari, maxfiy kalitlari va serverlari bor.</td></tr>
+      <tr><td><b>Oʻzgarish</b></td><td>Taʼrifga kiritilgan bitta atomar tahrir: odam oʻqiy oladigan matn va mashina yoʻli bilan, masalan <code>~ logic.apis.post_work_orders.access</code>.</td></tr>
+      <tr><td><b>Qoralama / Saqlash</b></td><td>Mantiq elementidagi tahrirlar saqlanmaguncha (⌘S) qoralama hisoblanadi. Saqlangan oʻzgarishlar keyingi relizga navbatga qoʻyiladi.</td></tr>
+      <tr><td><b>Reliz</b></td><td>Saqlangan oʻzgarishlarning nomlangan, oʻzgarmas surati; muhitga koʻtariladi (masalan, v1.4 → Production).</td></tr>
+      <tr><td><b>Rol / Ruxsat</b></td><td>Ilova darajasidagi kirish huquqi (Admin, Dispatcher, Technician, Customer; <code>work_orders.write</code> kabi ruxsatlar). Studio aʼzolaridan alohida.</td></tr>
+      <tr><td><b>Oʻzgarishlar rejasi</b></td><td>Studio AI taklif qilgan oʻzgarishlar toʻplami; foydalanuvchi qoʻllaydigan yoki rad etadigan farq (diff) sifatida koʻrsatiladi.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Funksional spetsifikatsiya</h2>
+  <h3>3.1 Studio qobigʻi</h3>
+  <ul>
+    <li><b>Yuqori panel:</b> ilova almashtirgich (qidiruv, soʻnggi ilovalar, holat, yangi ilova), qatlam yorliqlari quyidagi tartibda: <i>Interfeys · Mantiq · Maʼlumotlar · Saqlash · Oldindan koʻrish · Relizlar</i>, muhit va saqlash holati, profil menyusi (mavzu, til, chiqish), loyiha sozlamalari.</li>
+    <li><b>Uch ustunli tartib</b> har bir qatlamda: chap navigator, markaziy ish maydoni, oʻng inspektor / Studio AI. Ikkala yon panel ham ikonkalar qatoriga yigʻiladi (⌘, va ⌘\ panellarni yashiradi; toʻliq ekran rejimi). Tor oynalarda panellar avtomatik yigʻiladi.</li>
+    <li><b>Oʻzgarishlar jurnali:</b> har bir tahrir Relizlar boʻlimida koʻrsatiladigan oʻzgarish yozuvini qoʻshadi yoki yangilaydi (kalit boʻyicha upsert).</li>
+  </ul>
+
+  <h3>3.2 Interfeys qatlami</h3>
+  <ul>
+    <li><b>Chap panel:</b> “UI elementlari” sarlavhasi, Sahifa komponentlari roʻyxati (joriy sahifadagi bloklar, tanlash uchun bosiladi), qidiruv, guruhlangan element plitkalari (Matn va Tartib, Maʼlumotlar va h.k.). Kanvasga sudrab tashlash yoki ikki marta bosish orqali qoʻshiladi.</li>
+    <li><b>Kanvas asboblar paneli:</b> sahifa tanlagich (sahifalar va navigatsiya), ekran oʻlchami va masshtab, toʻliq ekran.</li>
+    <li><b>Kanvas:</b> bloklar qatorlarga joylashtiriladi; tashlash nuqtalari chap/oʻng/yuqori/past; yuqori/past/chap/oʻng boshqaruvlari bilan tartibni oʻzgartirish; tanlov chegarasi.</li>
+    <li><b>Oʻng panel:</b> tanlangan element xususiyatlari (Tarkib, Uslub, Koʻrinish boʻlimlari). Hech narsa tanlanmaganda joriy sahifa sozlamalari koʻrsatiladi.</li>
+    <li><b>Sahifalar:</b> ikonka, nom, marshrut, “menyuda koʻrsatish” va har bir rol uchun ruxsatlar bilan yaratiladi. Misol ilova mobil qurilmada yigʻiladigan chap yon menyudan foydalanadi.</li>
+    <li><b>UI element shakli oynasi:</b> nom, ikonka tanlagich, standart qiymatlar. <i>Ochiq masala: ikonka tanlagich oʻlchami.</i></li>
+  </ul>
+
+  <h4>3.2.1 Sahifa mantigʻi (Kod rejimi)</h4>
+  <p>Har bir sahifada aynan bitta JavaScript fayli — <b>sahifa mantigʻi</b> bor. U sahifaning mijoz tomonidagi holati, hayot sikli hooklari va ishlovchilarini boshqaradi. Server ishlari Mantiq qatlamida qoladi; sahifa mantigʻi ularni chaqiradi.</p>
+  <ul>
+    <li><b>Dizayn / Kod almashtirgichi</b> kanvas asboblar panelida (Koʻrib chiqish yonida). Kod rejimi kanvasni joriy sahifa muharriri bilan almashtiradi; sahifa tanlagich fayllarni almashtiradi. Tezkor tugma ⌘E.</li>
+    <li><b>Muharrir:</b> qator raqamlari, sintaksis ranglari, <code>ctx.blocks.*</code> (sahifa bloklari), <code>ctx.data.*</code> (jadvallar), <code>ctx.call()</code> (saqlangan funksiya va API’lar), <code>ctx.state.*</code> uchun avtomatik toʻldirish. Qidirish, yigʻish, saqlashda formatlash.</li>
+    <li><b>Kod rejimida chap panel:</b> <i>Tuzilma</i> (state, computed, hooklar, ishlovchilar — bosib oʻtish), <i>Sahifa bloklari</i> (bosib havola qoʻshish), <i>Mavjud mantiq</i> (signaturali funksiya va API’lar).</li>
+    <li><b>Bogʻlash faqat kodda.</b> Ishlovchilar bloklarga fayl ichida <code>on: { 'ordersTable.rowClick': … }</code> orqali bogʻlanadi; inspektor hodisalarni tahrirlamaydi. Blok id’lari barqaror, sarlavha oʻzgarsa bogʻlanish buzilmaydi.</li>
+    <li><b>Muammolar</b> paneli muharrir ostida: sintaksis xatolari, nomaʼlum blok id’lari va funksiyalar, notoʻgʻri argumentlar soni, ishlatilmagan ishlovchilar. Xatolar bor ekan, reliz bloklanadi.</li>
+    <li><b>Konsol</b> yorligʻi: ushbu sahifa uchun Koʻrib chiqishdagi <code>ctx.log()</code> chiqishi va ish vaqti xatolari, rol va vaqt bilan.</li>
+    <li><b>Studio AI</b> Kod rejimida fayl, sahifa bloklari va Mantiq signaturalarini kontekst sifatida oladi va qoʻllash yoki bekor qilish uchun diff qaytaradi.</li>
+    <li><b>Saqlash:</b> Mantiqdagidek — sahifada saqlanmagan nuqta, Bekor qilish · Saqlash (⌘S). Saqlash bitta oʻzgarish yozadi: <code>~ interface.pages.{id}.script</code>.</li>
+    <li><b>Qum quti:</b> faqat brauzerda ishlaydi, DOM va <code>fetch</code> yoʻq; tarmoq <code>ctx.call()</code> orqali, shuning uchun §3.3 dagi kirish qoidalari doim amal qiladi.</li>
+  </ul>
+
+  <pre>export default definePage({
+  state: { filter: 'open', selected: null },
+  computed: { overdue: (ctx) =&gt; ctx.blocks.ordersTable.rows.filter(r =&gt; r.slaDue &lt; Date.now()) },
+  async onLoad(ctx) { await ctx.blocks.ordersTable.load({ status: ctx.state.filter }) },
+  on: {
+    'statusFilter.change': (ctx, v) =&gt; { ctx.state.filter = v; ctx.blocks.ordersTable.reload() },
+    'assignBtn.click': async (ctx) =&gt; {
+      const tech = await ctx.call('assignNearestTech', ctx.state.selected.id)
+      ctx.toast('Assigned to ' + tech.name)
+    }
+  }
+})</pre>
+  <h3>3.3 Mantiq qatlami</h3>
+  <p>Chap menyu guruhlari — <b>Funksiyalar, API’lar, Cron’lar, Xabar navbatlari</b> — har biri yigʻiladigan, elementlar soni, holat nuqtalari, saqlanmagan oʻzgarish belgilari va yaratish uchun sichqoncha olib borilganda chiqadigan “+” bilan. Yagona qidiruv barcha toʻrt guruhdan elementlarni topadi.</p>
+  <h4>Funksiyalar (metod quruvchi)</h4>
+  <ul>
+    <li>Funksiya — <b>qatlamlarning</b> tartiblangan daraxti: <i>If, Switch, For each, Set variable, Return</i> (mantiq); <i>Select query, Execute query</i> (maʼlumotlar); <i>HTTP request, MQ produce, MQ consume</i> (integratsiyalar); va <i>Function</i> (boshqa saqlangan funksiyani chaqirish).</li>
+    <li>Qatlamlar chapdagi qidiriladigan “Metod qatlamlari” palitrasidan sudrab tashlash yoki ikki marta bosish orqali qoʻshiladi, istalgan tarmoqqa (Then/Else, case’lar, sikl tanasi) joylashtiriladi, sudrash yoki yuqoriga/pastga koʻchirish bilan tartiblanadi, nusxalanadi va oʻchiriladi. Return qatlamlarini tugmalar orqali koʻchirib, nusxalab yoki oʻchirib boʻlmaydi.</li>
+    <li>Uch koʻrinish: <b>Quruvchi</b>, <b>Blok-sxema</b> (avtomatik joylashadi, tarmoqlar yonma-yon, bosib tanlanadi) va <b>JSON</b> (nusxalanadi).</li>
+    <li><b>Imzo:</b> tiplangan parametrlar (nom, tip, majburiy) va qaytish tipi. <code>object</code> va <code>array&lt;object&gt;</code> tiplari istalgan chuqurlikdagi ichki maydonlarni saqlaydi. Tiplar: string, number, integer, boolean, date, datetime, enum, object, array&lt;…&gt;, file, any, <code>row&lt;table&gt;</code>, <code>array&lt;table&gt;</code>.</li>
+    <li><b>Return qatlami</b> yoki <i>oʻzgaruvchini</i> (avval oʻrnatilgan har qanday qiymat — parametrlar, soʻrov natijalari, sikl elementlari, funksiya natijalari; standart holatda oxirgi funksiya natijasi) yoki <i>funksiya chaqiruvini</i> qaytaradi. Uning manba tipi eʼlon qilingan qaytish tipi bilan solishtiriladi; mos kelmaslik, yetishmayotgan majburiy maydonlar va notoʻgʻri argumentlar soni xato sifatida panelda va qatlamdagi belgida koʻrsatiladi.</li>
+    <li>Oʻng panel yorliqlari: <b>Qatlam</b> (tanlangan qatlam yoki metod sozlamalari) va <b>AI yordamchi</b> (qatlam qoʻshish uchun soʻrov).</li>
+  </ul>
+  <h4>API’lar</h4>
+  <ul>
+    <li>API — qatlamlari funksiya chaqiruvlaridan iborat trigger. Saqlangan funksiyalar chap panelda roʻyxatlanadi va qidiriladi; qoʻshish uchun sudrang yoki ikki marta bosing.</li>
+    <li>Yigʻiladigan boʻlimlardagi sozlamalar: <b>Endpoint</b> (metod, <code>:params</code> bilan yoʻl), <b>Kirish</b> (Public / Basic auth / Token; har qanday autentifikatsiyadan oʻtgan yoki faqat tanlangan rollar va ruxsatlar), <b>Soʻrov · kirish</b> (Path, Headers, Query, Body yorliqlari; content type; maydon nomi, tipi, majburiyligi; ichki obyektlar; avtomatik misol), <b>Javob · chiqish</b> (har bir status kodi 200/400/401/403/500 uchun maydonlar va content type, avtomatik misol).</li>
+    <li>Yorliqlar: <b>Muammolar</b> (jonli tekshiruv: mavjud boʻlmagan funksiyalar, argumentlar soni, eʼlon qilinmagan <code>input.x</code>, oʻrnatilishidan oldin ishlatilgan, ishlatilmagan parametrlar, kirish sozlamasidagi xatolar), <b>Test</b> (parametrlarni toʻldirish, yuborish, status, vaqt va javobni koʻrish), <b>Ishga tushirishlar</b> (status, muhit, kechikish bilan tarix), <b>Tarix</b> (avval relizga chiqmagan oʻzgarishlar, keyin audit izi).</li>
+  </ul>
+  <h4>Cron’lar</h4>
+  <ul><li>Nom, cron jadvali, vaqt mintaqasi, Toʻxtatish/Davom ettirish, Hozir ishga tushirish; tanasi funksiya chaqiruvlari roʻyxatidan iborat (API’lar bilan bir xil quruvchi).</li></ul>
+  <h4>Xabar navbatlari</h4>
+  <ul>
+    <li>Navbat — funksiyalar orasidagi kanal. <b>Oqim</b> yorligʻi: Kim yuboradi (MQ produce qatlamlaridan avtomatik aniqlanadi) → Navbat (xabar maydonlari) → Kim qayta ishlaydi (iste’molchi funksiyalar, biriktirish uchun sudrang). “Hammasini qayta yuborish” bilan dead-letter xulosasi.</li>
+    <li><b>Xabarlar</b> yorligʻi: holati (Kutmoqda, Yetkazildi, Qayta urinilmoqda, Dead-letter), urinishlar soni, tarkibi bilan soʻnggi xabarlar, Qayta yuborish/Oʻchirish. <b>Sozlamalar</b>: xabar maydonlari, parallellik, qayta urinishlar, kutish strategiyasi, vaqt chegarasi, tartib boʻyicha yetkazish.</li>
+  </ul>
+  <h4>Saqlash</h4>
+  <p>Har bir Mantiq elementi birinchi tahrirda surat oladi. Sarlavhada “Saqlanmagan oʻzgarishlar · Bekor qilish · Saqlash” (⌘S) koʻrsatiladi. Bekor qilish suratni tiklaydi va kutilayotgan oʻzgarishlarni olib tashlaydi.</p>
+
+  <h3>3.4 Maʼlumotlar qatlami</h3>
+  <ul>
+    <li>Har bir ilova uchun bir nechta maʼlumotlar bazasi ulanishi: PostgreSQL, MySQL, SQL Server, MongoDB, Redis. Test bilan ulanish shakli; har bir muhit uchun alohida kirish maʼlumotlari.</li>
+    <li>Tiplangan maydonlar, bogʻlanishlar va bogʻlanishlar diagrammasi bilan jadvallar/kolleksiyalar; har bir dialekt uchun DDL koʻrinishi.</li>
+    <li>Test maʼlumotlarini yaratish, SQL konsol (standart holatda faqat Development), yozuvlarni koʻrib chiqish.</li>
+    <li>Sxema oʻzgarishlari relizlarda migratsiyaga aylanadi; yozuvlar muhitlar orasida hech qachon koʻchmaydi.</li>
+  </ul>
+
+  <h3>3.5 Saqlash qatlami</h3>
+  <ul>
+    <li><b>Obyekt xotirasi (MinIO / S3 bilan mos):</b> istalgan miqdordagi xizmatlarni ulash (endpoint, region, TLS, har bir muhit uchun kalitlar, test, uzish). Maqsadi, obyektlar soni, hajmi, kirish turi (Private / Signed URLs / Public read) va versiyalash bilan bucket’lar. Bucket fayl brauzeri: yuklash, yuklab olish, imzolangan havola, oʻchirish. “Kim foydalanadi” unga murojaat qiladigan maydonlar va funksiyalarni koʻrsatadi.</li>
+    <li><b>Lokal xotira:</b> ilova serverining fayl tizimi ildiz papka ostida (masalan, Ubuntu’dagi <code>/var/platon/fieldops</code>). Faqat eʼlon qilingan papkalarga kirish mumkin. Har bir papka uchun: hajm chegarasi, funksiyalar huquqi (yoʻq / oʻqish / oʻqish va yozish), tozalash qoidasi, obyekt xotirasiga tungi zaxira nusxa, fayl brauzeri. Disk bandligi va replikatsiya yoʻqligi haqida ogohlantirish.</li>
+    <li>Funksiyalar fayllarga <code>s3://{storage}/{bucket}/…</code> yoki <code>local://{folder}/…</code> orqali murojaat qiladi. <i>Quruvchi uchun Saqlash qatlamlari (yuklash, oʻqish, oʻchirish, imzolangan URL) rejalashtirilgan.</i></li>
+  </ul>
+
+  <h3>3.6 Oldindan koʻrish</h3>
+  <p>Ilovani Development maʼlumotlari bilan tanlangan rol nomidan ishga tushiradi. Sahifa va element koʻrinish qoidalari qoʻllaniladi. Qurilma oʻlchamlari kanvasdagi andozalarga mos.</p>
+
+  <h3>3.7 Relizlar va muhitlar</h3>
+  <ul>
+    <li>Sohalar boʻyicha guruhlangan kutilayotgan oʻzgarishlar roʻyxati (Sahifalar, Mantiq, Maʼlumotlar bazasi, Saqlash, Sozlamalar) mashina yoʻllari bilan.</li>
+    <li>Reliz yaratish (nom, izoh) → Development → Staging → Production’ga joylash; Production uchun tasdiqlash bosqichi; avvalgi relizga qaytish.</li>
+    <li>Reliz tarkibi: taʼrif farqi, yaratilgan DB migratsiyalari, saqlash/bucket/papka taʼminoti. Hech qachon yozuvlar, fayllar, xabarlar yoki ishga tushirish tarixi emas.</li>
+  </ul>
+
+  <h3>3.8 Loyiha sozlamalari</h3>
+  <table>
+    <thead><tr><th style="width:20%">Sahifa</th><th>Qamrov</th></tr></thead>
+    <tbody>
+      <tr><td>Umumiy</td><td>Nom, slug/manzil, standart til va vaqt mintaqasi.</td></tr>
+      <tr><td>Aʼzolar</td><td>Studio foydalanuvchilari va Studio rollari (Owner, Admin, Editor, Viewer); taklif qilish, olib tashlash.</td></tr>
+      <tr><td>Ish jarayonlari</td><td>Yozuvlar uchun holat mashinalari (holatlar, oʻtishlar, kim oʻtkaza oladi).</td></tr>
+      <tr><td>Tarjimalar</td><td>Ilova tillari; yetishmayotgan tarjimalar soni bilan kalitlar jadvali; AI tarjima.</td></tr>
+      <tr><td>Git</td><td>Repozitoriyni ulash; branch; kod eksporti manzili.</td></tr>
+      <tr><td>CI/CD</td><td>Pipeline bosqichlari (tekshirish, testlar, staging, tasdiqlash, production), trigger, ishga tushirish tarixi, muhit oʻzgaruvchilari va maxfiy kalitlar.</td></tr>
+      <tr><td>Agent.md</td><td>Studio AI uchun loyiha koʻrsatmalari (tahrirlash / koʻrish).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.9 Studio AI</h3>
+  <ul>
+    <li>Har bir qatlamdagi oʻng panel; sanalar boʻyicha guruhlangan tarix bilan chat, <code>/</code> buyruq yorliqlari, kontekst bandligi halqasi, biriktirilgan kontekst chiplari (tanlangan element, sahifa, funksiya).</li>
+    <li><b>Oʻzgarishlar rejalarini</b> chiqaradi (kutilmoqda → qoʻllandi / bekor qilindi). Mantiq qatlamida yordamchi qatlamlar qoʻshadi, iste’molchilarni biriktiradi yoki API yaratadi; oʻzgarishlar saqlanmaguncha saqlanmagan hisoblanadi.</li>
+    <li>Modellar: provayder adapterlari orqali Claude va GPT, boshqa modellar va lokal agentlar MCP orqali (§4.4).</li>
+  </ul>
+
+  <h2 style="break-before:page">4. Texnik arxitektura</h2>
+  <h3>4.1 Texnologiyalar steki</h3>
+  <p>Tanlangan stek — <b>Vue</b> frontend va <b>Spring Boot (Java)</b> backend — juda mos. Tavsiya etilgan aniq tanlovlar:</p>
+  <table>
+    <thead><tr><th style="width:22%">Soha</th><th>Tavsiya</th></tr></thead>
+    <tbody>
+      <tr><td>Studio frontend</td><td>Vue 3 (Composition API) + TypeScript, Vite, Pinia, Vue Router, VueUse. Kod/SQL/JSON uchun Monaco. Blok-sxema va ER joylashuvi uchun ELK.js. Prototip tokenlari asosida oʻz komponentlar kutubxonasi.</td></tr>
+      <tr><td>Yaratilgan ilova frontendi</td><td>Sahifa taʼriflarini talqin qiluvchi Vue 3 renderer; Oldindan koʻrishda ham xuddi shu renderer.</td></tr>
+      <tr><td>Backend</td><td>Spring Boot 3.3+, <b>Java 21</b> (virtual threads), Spring Security (OIDC resource server), Spring WebSocket, Flyway, koʻp dialektli SQL va DDL yaratish uchun jOOQ, testlar uchun Testcontainers.</td></tr>
+      <tr><td>Identifikatsiya</td><td>Studio foydalanuvchilari uchun Keycloak (yoki istalgan OIDC provayder); runtime autentifikatsiyasi uchun har bir ilovaning oʻz foydalanuvchilar bazasi.</td></tr>
+      <tr><td>Platforma DB</td><td>PostgreSQL 16 (taʼriflar JSONB sifatida + relyatsion metamaʼlumotlar).</td></tr>
+      <tr><td>Xabarlar</td><td>Standart RabbitMQ (oʻrnatilgan DLQ, qayta urinishlar, single-active consumer orqali tartib); ixtiyoriy Kafka adapteri.</td></tr>
+      <tr><td>Rejalashtirish</td><td>Klasterli JDBC rejimidagi Quartz (yoki db-scheduler).</td></tr>
+      <tr><td>Kesh / mavjudlik</td><td>Redis.</td></tr>
+      <tr><td>Saqlash</td><td>MinIO Java SDK (S3 API); ilova serverlarida lokal fayl tizimi agenti.</td></tr>
+      <tr><td>Maxfiy kalitlar</td><td>HashiCorp Vault (SaaS); oʻz serverida oʻrnatish uchun Kubernetes secrets yoki Vault.</td></tr>
+      <tr><td>Kuzatuvchanlik</td><td>OpenTelemetry, Prometheus, Grafana, Loki/Tempo.</td></tr>
+      <tr><td>Joylash</td><td>Kubernetes + Helm (SaaS va korporativ self-hosted); kichik self-hosted oʻrnatishlar uchun Docker Compose.</td></tr>
+    </tbody>
+  </table>
+  <p><b>Qoʻshimcha tavsiyalar:</b> ilova taʼrifini JSON Schema sifatida belgilang va undan TypeScript tiplarini (frontend) hamda Java record’larini (backend) yarating — shunda model hech qachon ajralib ketmaydi. Shartlar, argumentlar va qiymatlar uchun SpEL yoki JavaScript oʻrniga himoyalangan ifoda tili (<b>CEL</b>) dan foydalaning. Jamoa xohlasa, Java oʻrniga Kotlin ham mos keladi; bu boshqa hech narsani oʻzgartirmaydi.</p>
+
+  <h3>4.2 Xizmatlar</h3>
+  <table>
+    <thead><tr><th style="width:24%">Xizmat</th><th>Masʼuliyat</th></tr></thead>
+    <tbody>
+      <tr><td><b>Studio Web</b></td><td>Barcha qatlamlar, Oldindan koʻrish va sozlamalar uchun Vue SPA.</td></tr>
+      <tr><td><b>Studio API</b></td><td>Loyihalar, aʼzolar, taʼriflar, oʻzgarishlar, saqlashlar, relizlar, tekshiruv, test ishga tushirishlar. REST + WebSocket.</td></tr>
+      <tr><td><b>Taʼriflar ombori</b></td><td>Versiyalangan taʼrif hujjatlari, oʻzgarishlar jurnali, reliz suratlari (Studio API ichida, PostgreSQL).</td></tr>
+      <tr><td><b>Validator</b></td><td>Funksiyalar, API’lar, cron’lar, navbatlar va qaytish yoʻllari uchun tip tekshiruvchisi; Muammolarni hosil qiladi.</td></tr>
+      <tr><td><b>Runtime</b></td><td>Har bir muhit uchun: yaratilgan ilovani xizmat qiladi, funksiyalarni bajaradi, API’larni ochadi, cron’lar va navbat iste’molchilarini ishga tushiradi.</td></tr>
+      <tr><td><b>Konnektor ishchilari</b></td><td>Maʼlumotlar bazasi drayverlari, MinIO, lokal FS agenti, HTTP chiqish.</td></tr>
+      <tr><td><b>AI Gateway</b></td><td>Model adapterlari, MCP server va mijoz, kontekstni yigʻish, oʻzgarishlar rejasini yaratish, tokenlar hisobi.</td></tr>
+      <tr><td><b>Reliz va CI xizmati</b></td><td>Reliz paketlarini, migratsiyalarni, taʼminotni quradi, pipeline’larni ishga tushiradi, Git’ga kod eksport qiladi (JGit).</td></tr>
+    </tbody>
+  </table>
+  <pre>Studio Web ──REST/WS──▶ Studio API ──▶ PostgreSQL (taʼriflar, oʻzgarishlar, relizlar)
+     │                      │  ├─▶ Validator
+     │                      │  ├─▶ AI Gateway ──▶ Claude · GPT · MCP serverlar · lokal agentlar
+     │                      │  └─▶ Reliz va CI ──▶ Git · Runtime(muhit)
+     ▼                      ▼
+ Oldindan koʻrish ◀──── Runtime (Dev / Staging / Prod)
+                          ├─▶ Ilova DB’lari (Postgres, MySQL, SQL Server, Mongo, Redis)
+                          ├─▶ RabbitMQ · Quartz
+                          └─▶ MinIO / S3 · lokal papkalar</pre>
+
+  <h3>4.3 Bajarish modeli (gibrid)</h3>
+  <ul>
+    <li><b>Talqin qilinadigan (standart):</b> Runtime reliz qilingan taʼrifni yuklaydi va sahifalar, funksiya qatlam daraxtlari, API’lar, cron’lar va navbatlarni talqin qiladi. Joylash — bu taʼrifni almashtirish: soniyalar, build kerak emas.</li>
+    <li><b>Kod eksporti:</b> Reliz xizmati oʻqiladigan Spring Boot + Vue loyihasini yaratadi (JTE shablonlari orqali), uni ulangan Git repozitoriyga commit qiladi va CI/CD orqali ishga tushira oladi. Eksport bir tomonlama; qoʻlda tahrirlangan kodni qayta import qilish v1 qamroviga kirmaydi.</li>
+    <li>Ikkala yoʻl ham bir xil validatordan foydalanadi, shuning uchun xatti-harakat va xatolar mos keladi.</li>
+  </ul>
+
+  <h3>4.4 AI integratsiyasi</h3>
+  <ul>
+    <li><b>Provayderlar:</b> Anthropic Claude va OpenAI GPT uchun bitta interfeys ortidagi adapterlar (chat, vositalardan foydalanish, striming). Tashkilot standart modelni tanlaydi; funksiyalar boʻyicha alohida sozlash mumkin.</li>
+    <li><b>MCP server:</b> Studio istalgan model yoki lokal agentga vositalar taqdim etadi: <code>read_definition</code>, <code>search_definition</code>, <code>propose_changes</code>, <code>validate</code>, <code>run_function_test</code>, <code>run_sql_dev</code>, <code>generate_test_data</code>.</li>
+    <li><b>MCP mijoz:</b> loyihalar yordamchi chaqira oladigan tashqi MCP serverlarni (hujjatlar, tiket tizimlari, ichki vositalar) qoʻsha oladi.</li>
+    <li><b>Lokal agentlar:</b> dasturchilar oʻz kompyuteridagi agentlarni (masalan, kod yozuvchi agentlar) bitta loyiha va muhit bilan cheklangan shaxsiy token orqali MCP bilan ulaydi.</li>
+    <li><b>Xavfsizlik:</b> AI faqat <code>propose_changes</code> orqali yozadi; rejalar qoʻllashdan oldin tekshiriladi va koʻrsatiladi. Production maʼlumotlari hech qachon modellarga yuborilmaydi; SQL vositalari faqat Development bilan cheklangan. Agent.md loyiha konteksti sifatida qoʻshiladi.</li>
+  </ul>
+
+  <h3>4.5 Real vaqtda hamkorlik</h3>
+  <p>Tahrirlar taʼrif reviziyasiga nisbatan oʻzgarish operatsiyalari sifatida yuboriladi. Server ularni tartib bilan qoʻllaydi, bir xil tugundagi ziddiyatli operatsiyalarni rad etadi (mijoz qayta asoslaydi) va boshqa tahrirlovchilarga WebSocket orqali tarqatadi. Mavjudlik (kim qaysi sahifa yoki funksiyani koʻryapti) Redis’da saqlanadi. Kimdir saqlanmagan oʻzgarishlarga ega boʻlsa, Mantiq elementlari yumshoq qulflanadi.</p>
+
+  <h2>5. Ilova taʼrifi (JSON sxema)</h2>
+  <p>Har bir loyiha reviziyasi uchun bitta hujjat. Identifikatorlar barqaror snake_case; havolalar nomlardan emas, identifikatorlardan foydalanadi.</p>
+  <pre>{
+  "id": "fieldops", "name": "FieldOps Service Desk", "version": 142,
+  "settings": { "defaultLanguage": "en", "timezone": "America/Los_Angeles", "languages": ["en","es"] },
+  "roles": [{ "id": "dispatcher", "name": "Dispatcher", "permissions": ["work_orders.write"] }],
+  "interface": { "navigation": { "type": "sidebar" }, "pages": [ … ] },
+  "data":      { "connections": [ … ], "tables": [ … ] },
+  "logic":     { "functions": [ … ], "apis": [ … ], "crons": [ … ], "queues": [ … ] },
+  "storage":   { "object": [ … ], "local": { "root": "/var/platon/fieldops", "folders": [ … ] } },
+  "workflows": [ … ], "translations": { … }
+}</pre>
+  <h4>Sahifa va blok</h4>
+  <pre>{ "id": "orders", "name": "Work orders", "icon": "clipboard-list", "route": "/orders", "inMenu": true,
+  "visibleTo": ["admin","dispatcher"],
+  "script": { "lang": "js", "file": "pages/orders.page.js", "source": "export default definePage({ … })",
+    "bindings": ["statusFilter.change", "assignBtn.click"], "calls": ["assignNearestTech"] },
+  "blocks": [{ "id": "b3", "type": "data_table", "title": "All work orders", "row": 2,
+    "props": { "source": "data.work_orders", "columns": ["id","status","priority"] },
+    "visibility": { "roles": ["admin","dispatcher"] } }] }</pre>
+  <h4>Tiplangan maydon (parametrlar, qaytish qiymatlari, soʻrov, javob, xabar maydonlarida ishlatiladi)</h4>
+  <pre>{ "name": "order", "type": "object", "req": true,
+  "fields": [{ "name": "id", "type": "string", "req": true },
+             { "name": "site", "type": "row&lt;sites&gt;", "req": false }] }</pre>
+  <h4>Funksiya</h4>
+  <pre>{ "id": "assign_nearest_tech", "name": "assignNearestTech", "timeout": "30 s",
+  "params": [{ "name": "order_id", "type": "string", "req": true }],
+  "returns": { "type": "object", "fields": [{ "name": "assigned", "type": "boolean", "req": true }] },
+  "steps": [
+    { "id": "s1", "type": "select", "table": "technicians", "where": "on_shift = true", "limit": "50", "into": "techs" },
+    { "id": "s2", "type": "if", "condition": "size(techs) == 0",
+      "then": [ { "id": "s3", "type": "return", "from": "fn", "fn": "notifyNoTech", "args": "input.order_id" } ],
+      "else": [ { "id": "s4", "type": "call", "fn": "pickNearest", "args": "techs, input.order_id", "into": "result" } ] },
+    { "id": "s5", "type": "return", "from": "var", "var": "result" } ] }</pre>
+  <p>Qadam turlari: <code>if</code> (then/else), <code>switch</code> (value, cases{}, default), <code>for</code> (list, as, do), <code>set</code>, <code>return</code> (from var|fn), <code>select</code>, <code>execute</code>, <code>http</code>, <code>produce</code>, <code>consume</code>, <code>call</code>.</p>
+  <h4>API, cron, navbat</h4>
+  <pre>{ "id": "post_work_orders", "method": "POST", "path": "/api/work-orders",
+  "access": { "type": "token", "who": "roles", "roles": ["Dispatcher","Admin"], "perms": [] },
+  "request":  { "contentType": "application/json", "path": [], "headers": [], "query": [], "body": [ …fields ] },
+  "responses": { "200": { "contentType": "application/json", "fields": [ … ] }, "400": { … } },
+  "steps": [ { "id": "s1", "type": "call", "fn": "createWorkOrder", "args": "input.site_id, …", "into": "order" } ] }
+
+{ "id": "nightly_sla", "name": "Nightly SLA check", "schedule": "0 2 * * *", "timezone": "America/Los_Angeles", "enabled": true, "steps": [ … ] }
+
+{ "id": "work_order_events", "name": "work-order-events", "fields": [ …fields ], "consumers": ["handleOrderEvents"],
+  "settings": { "concurrency": 5, "retries": 3, "backoff": "exponential", "timeout": "30 s", "ordered": false } }</pre>
+  <h4>Saqlash</h4>
+  <pre>{ "object": [{ "id": "field_files", "provider": "minio", "purpose": "files", "endpoint": "https://minio…:9000",
+     "region": "us-west-1", "tls": true, "credentials": { "development": "secret://field_files/development" },
+     "buckets": [{ "name": "fieldops-photos", "access": "private", "versioning": true }] }],
+  "local": { "root": "/var/platon/fieldops", "folders": [{ "id": "uploads", "path": "uploads",
+     "quota": "5 GB", "access": "rw", "cleanup": "7d", "backup": { "enabled": true, "target": "backups" } }] } }</pre>
+  <h4>Oʻzgarish va reliz</h4>
+  <pre>{ "id": "chg_8f21", "key": "api.post_work_orders.access.type", "area": "Logic", "author": "maya@acme",
+  "text": "Set access to Token on POST /api/work-orders", "op": "replace",
+  "path": "/logic/apis/post_work_orders/access/type", "value": "token", "baseVersion": 141 }
+
+{ "id": "rel_v1_5", "name": "v1.5", "fromVersion": 128, "toVersion": 142, "changes": ["chg_…"],
+  "migrations": ["V142__add_sla_due.sql"], "deployments": [{ "env": "staging", "status": "succeeded" }] }</pre>
+  <p>Oʻzgarishlar — metamaʼlumotlar bilan JSON Patch operatsiyalari (RFC 6902); maxfiy kalitlar faqat <code>secret://</code> havolalari sifatida saqlanadi.</p>
+
+  <h2 style="break-before:page">6. API va runtime spetsifikatsiyasi</h2>
+  <h3>6.1 Studio API (REST, <code>/api/v1</code>)</h3>
+  <table>
+    <thead><tr><th style="width:46%">Endpoint</th><th>Maqsad</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET/POST /projects</code>, <code>GET/PATCH/DELETE /projects/{id}</code></td><td>Loyihalar, ilova almashtirgich.</td></tr>
+      <tr><td><code>GET /projects/{id}/definition?version=</code></td><td>Toʻliq yoki qisman (<code>?paths=logic.apis</code>) taʼrif.</td></tr>
+      <tr><td><code>POST /projects/{id}/changes</code></td><td><code>baseVersion</code> bilan oʻzgarish operatsiyalarini qoʻllash; ziddiyatda 409.</td></tr>
+      <tr><td><code>POST /projects/{id}/logic/{kind}/{itemId}:save</code> · <code>:discard</code></td><td>Mantiq qoralamasini saqlash yoki bekor qilish.</td></tr>
+      <tr><td><code>POST /projects/{id}/validate</code></td><td>Butun loyiha yoki bitta element uchun muammolar.</td></tr>
+      <tr><td><code>POST /projects/{id}/logic/functions/{fid}:test</code> · <code>apis/{aid}:test</code></td><td>Kirish maʼlumotlari bilan Development’da test; status, vaqt, natija, iz qaytaradi.</td></tr>
+      <tr><td><code>GET /projects/{id}/logic/apis/{aid}/runs</code> · <code>/history</code></td><td>Ishga tushirish tarixi, oʻzgarishlar tarixi.</td></tr>
+      <tr><td><code>GET/POST /projects/{id}/queues/{qid}/messages</code>, <code>:replay</code></td><td>Xabarlarni koʻrish, test yuborish, qayta yuborish, oʻchirish (har bir muhit uchun).</td></tr>
+      <tr><td><code>/projects/{id}/data/connections</code>, <code>/tables</code>, <code>/sql</code>, <code>/test-data</code></td><td>Maʼlumotlar qatlami, konsol (standart holatda faqat Development).</td></tr>
+      <tr><td><code>/projects/{id}/storage/object</code>, <code>/buckets/{b}/files</code>, <code>/local/folders/{f}/files</code></td><td>Har bir muhit uchun saqlash sozlamalari va fayllarni koʻrish.</td></tr>
+      <tr><td><code>GET/POST /projects/{id}/releases</code>, <code>POST /releases/{rid}:deploy?env=</code>, <code>:rollback</code></td><td>Relizlar va joylashlar.</td></tr>
+      <tr><td><code>/projects/{id}/members</code>, <code>/settings/*</code>, <code>/git</code>, <code>/cicd/runs</code></td><td>Sozlamalar sahifalari.</td></tr>
+      <tr><td><code>POST /projects/{id}/ai/conversations/{cid}/messages</code> (SSE oqimi)</td><td>Studio AI chati; xabarlar va oʻzgarishlar rejalarini qaytaradi.</td></tr>
+      <tr><td><code>POST /projects/{id}/ai/plans/{pid}:apply</code> · <code>:discard</code></td><td>AI oʻzgarishlar rejasini qoʻllash yoki bekor qilish.</td></tr>
+      <tr><td><code>WS /ws/projects/{id}</code></td><td>Oʻzgarishlarni tarqatish, mavjudlik, ishga tushirish/log oqimi.</td></tr>
+    </tbody>
+  </table>
+  <p>Barcha endpoint’lar: OIDC bearer token, Studio rol tekshiruvlari, JSON xato tanasi <code>{ "error": "code", "message": "…", "details": [] }</code>, soʻrov identifikatori sarlavhasi, POST uchun idempotentlik kalitlari.</p>
+
+  <h3>6.2 Runtime: yaratilgan API’lar</h3>
+  <ul>
+    <li>Asosiy URL <code>https://{slug}.{env}.platon.app</code> (SaaS) yoki mijozning oʻz xosti (self-hosted).</li>
+    <li>Har bir soʻrov uchun ketma-ketlik: marshrut → <b>kirish</b> (public / basic / bearer token; rol yoki ruxsat tekshiruvi → 401/403) → soʻrov sxemasiga nisbatan <b>tekshiruv</b> (path, headers, query, body; majburiylik va tiplar → <code>missing</code>/<code>invalid</code> bilan 400) → qadamlarni bajarish → javobni eʼlon qilingan status sxemasiga moslash → ishga tushirishni jurnalga yozish.</li>
+    <li>Qadamlardagi xatolar 500 <code>{ "error": "runtime_error", "step": "s3", "message": … }</code> qaytaradi; funksiya vaqt chegarasidan oshsa 504 qaytaradi.</li>
+    <li>Har bir API va token uchun soʻrovlar chegarasi; CORS har bir ilova uchun sozlanadi.</li>
+  </ul>
+
+  <h3>6.3 Runtime: funksiyalarni bajarish</h3>
+  <ul>
+    <li>Interpretator qadamlar daraxtini quyidagi kontekst bilan aylanib chiqadi: <code>input</code> (tekshirilgan parametrlar), <code>into</code>/<code>set</code>/sikllar orqali oʻrnatilgan oʻzgaruvchilar, <code>env</code>, <code>user</code>, faqat oʻqish uchun <code>secrets</code>.</li>
+    <li>Ifodalar (shartlar, argumentlar, qiymatlar) CEL’dan foydalanadi; ixtiyoriy kod yoʻq. <code>select/execute</code> dagi SQL faqat <code>:name</code> bogʻlamalari orqali parametrlanadi.</li>
+    <li>Har bir ishga tushirish uchun chegaralar: vaqt (eʼlon qilingan), maksimal qadamlar, maksimal sikl iteratsiyalari, xotira, ilova boʻyicha HTTP chiqish oq roʻyxati.</li>
+    <li>Har bir ishga tushirish Test va Ishga tushirishlar uchun iz (qadam, davomiylik, qisqartirilgan kirish/chiqish) hosil qiladi.</li>
+  </ul>
+
+  <h3>6.4 Runtime: cron’lar va navbatlar</h3>
+  <ul>
+    <li>Cron’lar: Quartz klasteri, tugunlar boʻylab har bir jadval uchun bitta bajarish, oʻtkazib yuborilgan ishga tushirishlar uchun “bir marta bajarish” siyosati, har bir muhitda toʻxtatish/davom ettirish.</li>
+    <li>Navbatlar: har bir taʼrif navbati va muhit uchun RabbitMQ exchange + queue; iste’molchilar — funksiyalar; belgilangan yoki eksponensial kutish bilan qayta urinishlar, soʻngra dead-letter navbati; tartib boʻyicha rejim single active consumer’dan foydalanadi; xabar sxemasi yuborishda tekshiriladi.</li>
+  </ul>
+
+  <h3>6.5 Runtime: saqlash</h3>
+  <ul>
+    <li>Obyekt xotirasi S3 API orqali: standart holatda yopiq, imzolangan URL’lar (standart 1 soat), ochiq oʻqish faqat bucket’da yoqilganda.</li>
+    <li>Lokal papkalar har bir ilova serveridagi agent orqali: yoʻlni eʼlon qilingan papkalar bilan cheklash, hajm chegarasini qoʻllash, tozalash vazifasi, sozlangan obyekt xotirasiga tungi zaxira nusxa.</li>
+  </ul>
+
+  <h2>7. Nofunksional talablar</h2>
+  <h3>7.1 Unumdorlik va masshtab</h3>
+  <table>
+    <thead><tr><th style="width:46%">Talab</th><th>Maqsad</th></tr></thead>
+    <tbody>
+      <tr><td>Bir vaqtdagi Studio foydalanuvchilari (platforma)</td><td>500–1 000 faol, undan koʻproqqa gorizontal masshtablanadi</td></tr>
+      <tr><td>Bitta loyihada bir vaqtdagi tahrirlovchilar</td><td>Jonli mavjudlik bilan ≥ 20</td></tr>
+      <tr><td>Studio API oʻqish kechikishi (taʼrif, roʻyxatlar)</td><td>p95 &lt; 200 ms</td></tr>
+      <tr><td>Oʻzgarishni qoʻllash + boshqa tahrirlovchilarga tarqatish</td><td>p95 &lt; 300 ms</td></tr>
+      <tr><td>Bitta funksiya / API ni tekshirish</td><td>&lt; 150 ms (har bir tahrirda ishlaydi)</td></tr>
+      <tr><td>Kanvas va quruvchi bilan ishlash</td><td>Sahifada 200 blok yoki funksiyada 300 qatlam bilan 60 fps</td></tr>
+      <tr><td>Studio AI birinchi tokeni</td><td>&lt; 2 s; odatiy soʻrovlar uchun rejalar &lt; 15 s</td></tr>
+      <tr><td>Taʼrifni muhitga joylash (talqin qilinadigan)</td><td>&lt; 30 s</td></tr>
+      <tr><td>Studio’ning dastlabki yuklanishi</td><td>Keng polosali internetda &lt; 2,5 s; JS paketi qatlamlar boʻyicha boʻlinadi</td></tr>
+    </tbody>
+  </table>
+  <h3>7.2 Mavjudlik va tiklash</h3>
+  <ul>
+    <li>SaaS Studio va runtime: oyiga 99,9%. Platformani toʻxtovsiz yangilash.</li>
+    <li>Platforma DB: vaqt nuqtasiga tiklash; RPO ≤ 15 daqiqa, RTO ≤ 1 soat. Relizni orqaga qaytarish ≤ 2 daqiqa.</li>
+    <li>Self-hosted: HA Helm profili (har bir xizmat uchun ≥ 2 replika) va bitta tugunli Compose profili.</li>
+  </ul>
+  <h3>7.3 Xavfsizlik</h3>
+  <ul>
+    <li>Tenantlarni ajratish: har bir qatorda tashkilot identifikatori, PostgreSQL’da row-level security; har bir muhit uchun alohida runtime nomlar fazosi.</li>
+    <li>Studio rollari (Owner, Admin, Editor, Viewer); Production’ga joylash va maxfiy kalitlar faqat Admin/Owner uchun.</li>
+    <li>Maxfiy kalitlar Vault’da, faqat <code>secret://</code> orqali havola qilinadi; saqlangandan keyin brauzerga hech qachon qaytarilmaydi (yashirilgan, faqat almashtiriladi).</li>
+    <li>Himoyalangan bajarish: CEL ifodalari, parametrlangan SQL, chiqish oq roʻyxati, resurs chegaralari; v1 da foydalanuvchi yozgan kod yoʻq.</li>
+    <li>Har bir oʻzgarish, saqlash, reliz, joylash, maxfiy kalitga kirish va AI rejasini qoʻllash uchun audit jurnali.</li>
+    <li>Hamma joyda TLS; platforma DB va obyekt xotirasi uchun saqlashda shifrlash.</li>
+    <li>AI: soʻrovlarda Production yozuvlari yoki maxfiy kalitlar yoʻq; tashkilot model provayderlaridan voz kecha oladi; lokal agent tokenlari cheklangan va bekor qilinadigan.</li>
+    <li>Hozircha muvofiqlik sertifikati talab qilinmaydi; maʼlumotlar modelini GDPR’ga tayyor holda saqlang (eksport, oʻchirish, mintaqa boʻyicha maʼlumotlarni saqlash).</li>
+  </ul>
+  <h3>7.4 Boshqa talablar</h3>
+  <ul>
+    <li><b>Kuzatuvchanlik:</b> Studio API → Runtime → konnektorlar boʻylab izlar; har bir ilova uchun panellar (soʻrovlar, xatolar, kechikish, navbat chuqurligi, cron ishga tushirishlari).</li>
+    <li><b>Xalqarolashtirish:</b> Studio interfeysi va yaratilgan ilovalar lokalizatsiya qilinadi; Studio dastlab ingliz tilida chiqadi.</li>
+    <li><b>Foydalanish qulayligi:</b> yaratilgan ilovalar uchun WCAG 2.1 AA; Studio kanvasi va quruvchisi uchun klaviatura qoʻllab-quvvatlashi.</li>
+    <li><b>Brauzerlar:</b> Chrome, Edge, Firefox, Safari’ning soʻnggi ikki versiyasi; Studio asosan kompyuter uchun (≥ 1024 px), yaratilgan ilovalar moslashuvchan.</li>
+    <li><b>Testlash:</b> frontend va backend orasida JSON Schema shartnoma testlari; har bir qadam turi uchun interpretator “golden” testlari; har bir maʼlumotlar bazasi dialekti uchun Testcontainers.</li>
+  </ul>
+
+  <h2>8. Tasdiqlanishi kerak boʻlgan qarorlar</h2>
+  <ul>
+    <li>Standart broker sifatida RabbitMQ, ixtiyoriy adapter sifatida Kafka.</li>
+    <li>Shartlar va argumentlar uchun ifoda tili sifatida CEL.</li>
+    <li>v1 da kod eksporti bir tomonlama.</li>
+    <li>Toʻlovlar va tarif chegaralari (loyihalar, muhitlar, ishga tushirishlar) bu yerda koʻrib chiqilmagan.</li>
+    <li>Self-hosted oʻrnatishlar tashqi AI provayderlaridan foydalana oladimi yoki faqat lokal modellardanmi.</li>
+  </ul>
+</doc-page>
+</x-dc>
+</body>
+</html>

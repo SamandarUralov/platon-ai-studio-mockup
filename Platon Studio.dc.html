@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.469.0/font/lucide.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#17182a;background:#f5f5f8;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:inherit;color:inherit}
+a{color:#4f5bea;text-decoration:none}a:hover{color:#3540c9}
+[class^="icon-"],[class*=" icon-"]{font-size:16px;line-height:1}
+@keyframes dcdot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;overflow:auto;background:#fafafc">
+  <div style="height:60px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid #ececf2;background:#fff;position:sticky;top:0;z-index:2">
+    <div style="width:30px;height:30px;border-radius:9px;background:#17182a;color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px">P</div>
+    <div style="font-weight:700;font-size:15px">Platon AI Studio</div>
+    <div style="width:1px;height:20px;background:#e3e3ea;margin:0 4px"></div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:#4a4c5e;font-weight:500">Acme Facilities<i class="icon-chevron-down" style="font-size:14px"></i></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#ffe2d1;color:#9a4a1c;display:grid;place-items:center;font-size:12px;font-weight:700">MC</div>
+    </div>
+  </div>
+  <div style="max-width:820px;margin:0 auto;padding:72px 24px 48px;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 12px;border-radius:999px;background:#eef0ff;color:#3f4bd8;font-size:12.5px;font-weight:600"><i class="icon-sparkles" style="font-size:13px"></i>Describe it. Then shape it visually.</div>
+    <h1 style="font-size:46px;letter-spacing:-.03em;font-weight:800;margin:18px 0 12px;line-height:1.08;text-wrap:balance">What should your team’s next app do?</h1>
+    <p style="color:#6b6d80;font-size:16.5px;line-height:1.55;margin:0 auto;max-width:560px;text-wrap:pretty">Platon drafts the pages, database, workflows and access rules. Refine everything in visual editors — or keep talking to the AI. Both edit the same app.</p>
+    <div style="margin-top:32px;background:#fff;border:1px solid #e3e3ea;border-radius:16px;box-shadow:0 1px 2px rgba(20,20,40,.04),0 12px 32px rgba(20,20,40,.06);text-align:left;overflow:hidden">
+      <textarea value="{{ homePrompt }}" onChange="{{ onHomePrompt }}" rows="4" placeholder="e.g. An app for our field technicians to manage work orders, log hours and parts. Dispatchers assign jobs; customers see only their own jobs." style="width:100%;border:none;outline:none;resize:none;padding:20px 20px 8px;font-size:15.5px;line-height:1.55;background:transparent"></textarea>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 12px 14px">
+        <button style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:9px;border:1px solid #e6e6ee;background:#fff;font-size:13px;font-weight:600;color:#4a4c5e;cursor:pointer"><i class="icon-paperclip" style="font-size:14px"></i>Attach a spec</button>
+        <button onClick="{{ openGenerate }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:10px;border:none;background:#4f5bea;color:#fff;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:#4350e0"><i class="icon-sparkles" style="font-size:15px"></i>Draft my app</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px">
+      <sc-for list="{{ homeExamples }}" as="ex" hint-placeholder-count="3">
+        <button onClick="{{ ex.go }}" style="height:32px;padding:0 13px;border-radius:999px;border:1px solid #e3e3ea;background:#fff;font-size:13px;color:#4a4c5e;cursor:pointer" style-hover="border-color:#c7ccff;color:#3f4bd8">{{ ex.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="max-width:1080px;margin:0 auto;padding:8px 24px 72px">
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:16px">
+      <h2 style="margin:0;font-size:19px;font-weight:750;letter-spacing:-.01em">Your apps</h2>
+      <span style="font-size:13px;color:#8a8c9c">{{ projectCount }}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px">
+      <sc-for list="{{ projects }}" as="p" hint-placeholder-count="3">
+        <div style="background:#fff;border:1px solid #e8e8ef;border-radius:14px;overflow:hidden;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(20,20,40,.08)">
+          <div onClick="{{ p.open }}" style="height:150px;background:{{ p.tint }};padding:18px 22px 0;cursor:pointer;display:flex">
+            <div style="flex:1;background:#fff;border-radius:10px 10px 0 0;box-shadow:0 4px 14px rgba(20,20,40,.08);padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:6px;align-items:center"><div style="width:14px;height:14px;border-radius:4px;background:{{ p.accent }}"></div><div style="width:50px;height:6px;border-radius:3px;background:#e6e6ee"></div><div style="margin-left:auto;width:30px;height:6px;border-radius:3px;background:#efeff4"></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px"><div style="height:26px;border-radius:6px;background:#f5f5f8"></div><div style="height:26px;border-radius:6px;background:#f5f5f8"></div><div style="height:26px;border-radius:6px;background:#f5f5f8"></div></div>
+              <div style="height:7px;border-radius:3px;background:#efeff4"></div>
+              <div style="height:7px;width:80%;border-radius:3px;background:#efeff4"></div>
+              <div style="height:7px;width:60%;border-radius:3px;background:#efeff4"></div>
+            </div>
+          </div>
+          <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1">
+            <div style="font-weight:700;font-size:15.5px">{{ p.name }}</div>
+            <div style="font-size:13px;color:#6b6d80;line-height:1.45">{{ p.desc }}</div>
+            <sc-if value="{{ p.hasTag }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#0e7c66;font-weight:600;display:flex;align-items:center;gap:6px"><i class="icon-copy" style="font-size:12px"></i>{{ p.tag }}</div></sc-if>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+              <span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:{{ p.stBg }};color:{{ p.stFg }}">{{ p.status }}</span>
+              <span style="font-size:12px;color:#8a8c9c">{{ p.edited }}</span>
+              <div style="margin-left:auto;display:flex;gap:6px">
+                <button onClick="{{ p.copy }}" title="Duplicate app" style="width:32px;height:32px;border-radius:8px;border:1px solid #e6e6ee;background:#fff;cursor:pointer;display:grid;place-items:center;color:#4a4c5e"><i class="icon-copy" style="font-size:14px"></i></button>
+                <button onClick="{{ p.open }}" style="height:32px;padding:0 12px;border-radius:8px;border:none;background:#17182a;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Open</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ inStudio }}" hint-placeholder-val="{{ true }}">
+<div style="height:56px;flex:none;display:flex;align-items:center;gap:14px;padding:0 14px;background:#fff;border-bottom:1px solid #e8e8ef">
+  <button onClick="{{ goHome }}" title="All apps" style="width:32px;height:32px;border-radius:9px;background:#17182a;color:#fff;border:none;display:grid;place-items:center;font-weight:800;font-size:15px;cursor:pointer">P</button>
+  <div style="display:flex;flex-direction:column;line-height:1.2;min-width:0">
+    <div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;white-space:nowrap">FieldOps Service Desk<i class="icon-chevron-down" style="font-size:13px;color:#8a8c9c"></i></div>
+    <div style="font-size:11.5px;color:#6b6d80;display:flex;align-items:center;gap:6px;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#2fb36b"></span>Development · saved</div>
+  </div>
+  <div style="margin:0 auto;display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:10px">
+    <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="4">
+      <button onClick="{{ t.go }}" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.shadow }}"><i class="{{ t.icon }}" style="font-size:14px"></i>{{ t.label }}<sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#4f5bea;color:#fff;font-size:10.5px;display:grid;place-items:center">{{ t.badge }}</span></sc-if></button>
+    </sc-for>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button onClick="{{ goMeta }}" title="Advanced: app definition" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;border:1px solid {{ metaBtnBorder }};background:{{ metaBtnBg }};color:{{ metaBtnFg }};font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-code-xml" style="font-size:14px"></i>Advanced</button>
+    <div style="display:flex">
+      <div style="width:30px;height:30px;border-radius:50%;background:#ffe2d1;color:#9a4a1c;display:grid;place-items:center;font-size:11px;font-weight:700;border:2px solid #fff">MC</div>
+      <div style="width:30px;height:30px;border-radius:50%;background:#dff1ff;color:#1f6f99;display:grid;place-items:center;font-size:11px;font-weight:700;border:2px solid #fff;margin-left:-8px">JL</div>
+    </div>
+    <button onClick="{{ openRelease }}" style="display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:9px;border:none;background:#4f5bea;color:#fff;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#4350e0"><i class="icon-rocket" style="font-size:14px"></i>Release</button>
+  </div>
+</div>
+
+<sc-if value="{{ showCanvasRow }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:flex">
+
+  <sc-if value="{{ showLeftFull }}" hint-placeholder-val="{{ true }}">
+  <div style="width:236px;flex:none;background:#fff;border-right:1px solid #e8e8ef;display:flex;flex-direction:column;min-height:0">
+    <div style="display:flex;gap:4px;padding:10px;border-bottom:1px solid #efeff4">
+      <sc-for list="{{ leftTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.go }}" style="flex:1;height:32px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button></sc-for>
+    </div>
+    <sc-if value="{{ leftPages }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;overflow:auto;padding:14px 10px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9cab;padding:0 10px 8px">Pages &amp; navigation</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ pageList }}" as="p" hint-placeholder-count="4">
+          <div onClick="{{ p.go }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;background:{{ p.bg }};color:{{ p.fg }}" style-hover="background:#f5f5f8">
+            <i class="{{ p.icon }}" style="font-size:15px"></i>
+            <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">{{ p.name }}</div><div style="font-size:11.5px;color:#8a8c9c">{{ p.sub }}</div></div>
+            <sc-if value="{{ p.restricted }}" hint-placeholder-val="{{ false }}"><i class="icon-lock" title="Not visible to every role" style="font-size:12px;color:#9a9cab"></i></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <button onClick="{{ addPage }}" style="margin:8px 0 0;width:100%;height:34px;border-radius:8px;border:1px dashed #d6d7e2;background:transparent;color:#6b6d80;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px" style-hover="border-color:#4f5bea;color:#4f5bea"><i class="icon-plus" style="font-size:14px"></i>New page</button>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9cab;padding:22px 10px 8px">Blocks on this page</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ layerList }}" as="l" hint-placeholder-count="3">
+          <div onClick="{{ l.go }}" style="display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:13px;background:{{ l.bg }};color:{{ l.fg }}" style-hover="background:#f5f5f8">
+            <i class="{{ l.icon }}" style="font-size:14px;opacity:.8"></i><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ l.label }}</span><span style="font-size:11px;color:#9a9cab">{{ l.type }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+    <sc-if value="{{ leftAdd }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;overflow:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;color:#6b6d80;padding:0 2px 4px">Adds below the selected block.</div>
+      <sc-for list="{{ palette }}" as="k" hint-placeholder-count="5">
+        <button onClick="{{ k.add }}" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid #e8e8ef;background:#fff;cursor:pointer;text-align:left" style-hover="border-color:#c7ccff;background:#fafaff">
+          <div style="width:36px;height:36px;border-radius:9px;background:#f2f3ff;color:#4f5bea;display:grid;place-items:center;flex:none"><i class="{{ k.icon }}"></i></div>
+          <div><div style="font-size:13.5px;font-weight:600">{{ k.label }}</div><div style="font-size:12px;color:#8a8c9c;margin-top:2px">{{ k.desc }}</div></div>
+        </button>
+      </sc-for>
+      <div style="margin-top:6px;padding:12px;border-radius:10px;background:#f7f7fb;font-size:12.5px;line-height:1.5;color:#4a4c5e"><b style="color:#17182a">Tip:</b> ask Studio AI for something more specific, like “add a form so customers can request a visit”.</div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showLeftRail }}" hint-placeholder-val="{{ false }}">
+  <div style="width:60px;flex:none;background:#fff;border-right:1px solid #e8e8ef;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;position:relative">
+    <sc-for list="{{ pageList }}" as="p" hint-placeholder-count="4"><button title="{{ p.name }}" onClick="{{ p.go }}" style="width:40px;height:40px;border-radius:10px;border:none;background:{{ p.bg }};color:{{ p.fg }};cursor:pointer;display:grid;place-items:center"><i class="{{ p.icon }}"></i></button></sc-for>
+    <div style="width:28px;height:1px;background:#ececf2;margin:6px 0"></div>
+    <button title="Add block" onClick="{{ toggleRailAdd }}" style="width:40px;height:40px;border-radius:10px;border:1px dashed #cfd0dc;background:#fff;color:#4f5bea;cursor:pointer;display:grid;place-items:center"><i class="icon-plus"></i></button>
+    <sc-if value="{{ railAdd }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:64px;top:12px;width:260px;background:#fff;border:1px solid #e3e3ea;border-radius:12px;box-shadow:0 12px 32px rgba(20,20,40,.14);padding:8px;z-index:10;display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ palette }}" as="k" hint-placeholder-count="5"><button onClick="{{ k.add }}" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;border:none;background:transparent;cursor:pointer;text-align:left" style-hover="background:#f5f5f8"><i class="{{ k.icon }}" style="color:#4f5bea"></i><div><div style="font-size:13px;font-weight:600">{{ k.label }}</div><div style="font-size:11.5px;color:#8a8c9c">{{ k.desc }}</div></div></button></sc-for>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:#f1f1f5">
+    <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:48px;flex:none;display:flex;align-items:center;gap:12px;padding:6px 14px;background:#fff;border-bottom:1px solid #e8e8ef;flex-wrap:wrap">
+      <div style="font-size:13.5px;font-weight:700">{{ pageName }}</div>
+      <div style="font-size:12px;color:#8a8c9c;font-family:'JetBrains Mono',monospace">{{ pagePath }}</div>
+      <div style="margin-left:auto;display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:8px">
+        <sc-for list="{{ layouts }}" as="l" hint-placeholder-count="3"><button title="{{ l.label }}" onClick="{{ l.go }}" style="width:30px;height:26px;border-radius:6px;border:none;cursor:pointer;display:grid;place-items:center;background:{{ l.bg }};color:{{ l.fg }}"><i class="{{ l.icon }}" style="font-size:14px"></i></button></sc-for>
+      </div>
+      <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:8px">
+        <sc-for list="{{ devices }}" as="d" hint-placeholder-count="3"><button title="{{ d.label }}" onClick="{{ d.go }}" style="width:30px;height:26px;border-radius:6px;border:none;cursor:pointer;display:grid;place-items:center;background:{{ d.bg }};color:{{ d.fg }}"><i class="{{ d.icon }}" style="font-size:14px"></i></button></sc-for>
+      </div>
+      <button onClick="{{ goPreview }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-play" style="font-size:13px"></i>Preview</button>
+    </div>
+    </sc-if>
+    <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 14px;background:#fff;border-bottom:1px solid #e8e8ef">
+      <div style="font-size:12.5px;font-weight:600;color:#6b6d80">Preview as</div>
+      <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:10px;flex-wrap:wrap">
+        <sc-for list="{{ roleTabs }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.go }}" style="display:flex;flex-direction:column;align-items:flex-start;padding:5px 12px;border-radius:8px;border:none;cursor:pointer;background:{{ r.bg }};box-shadow:{{ r.shadow }};line-height:1.25"><span style="font-size:12.5px;font-weight:700;color:#17182a">{{ r.label }}</span><span style="font-size:11px;color:#8a8c9c">{{ r.user }}</span></button></sc-for>
+      </div>
+      <sc-if value="{{ hasLangs }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:8px">
+          <sc-for list="{{ langTabs }}" as="l" hint-placeholder-count="2"><button onClick="{{ l.go }}" style="height:28px;padding:0 10px;border-radius:6px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ l.bg }};color:{{ l.fg }}">{{ l.label }}</button></sc-for>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:8px">
+        <sc-for list="{{ devices }}" as="d" hint-placeholder-count="3"><button title="{{ d.label }}" onClick="{{ d.go }}" style="width:30px;height:28px;border-radius:6px;border:none;cursor:pointer;display:grid;place-items:center;background:{{ d.bg }};color:{{ d.fg }}"><i class="{{ d.icon }}" style="font-size:14px"></i></button></sc-for>
+      </div>
+      <button onClick="{{ goEditor }}" style="margin-left:auto;display:flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-pencil-ruler" style="font-size:13px"></i>Edit this page</button>
+    </div>
+    <div style="flex:none;padding:9px 16px;background:#fbfaff;border-bottom:1px solid #ececf2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:#4a4c5e">
+      <i class="icon-shield-check" style="color:#6b3fc9;font-size:14px"></i><span><b style="color:#17182a">{{ previewWho }}</b> {{ previewSummary }}</span>
+      <sc-for list="{{ activeRules }}" as="r" hint-placeholder-count="1"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:6px;background:#f3ecff;color:#5a32ad;font-size:11.5px;font-weight:600">{{ r }}</span></sc-for>
+    </div>
+    </sc-if>
+
+    <div style="flex:1;overflow:auto;padding:40px 24px 64px" onClick="{{ clearSel }}">
+      <div style="max-width:{{ frameW }};margin:0 auto;background:#fff;border-radius:14px;border:1px solid #e3e3ea;box-shadow:0 1px 2px rgba(20,20,40,.04),0 10px 30px rgba(20,20,40,.06)">
+        <div style="display:flex;align-items:center;gap:16px;padding:10px 22px;min-height:58px;border-bottom:1px solid #efeff4;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px"><div style="width:26px;height:26px;border-radius:7px;background:#0e7c66;color:#fff;display:grid;place-items:center;font-size:13px">F</div>FieldOps</div>
+          <div style="display:flex;gap:2px;flex-wrap:wrap">
+            <sc-for list="{{ navPages }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.go }}" style="height:34px;padding:0 12px;border-radius:8px;border:none;background:{{ n.bg }};color:{{ n.fg }};font-weight:600;font-size:13.5px;cursor:pointer">{{ n.label }}</button></sc-for>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <sc-if value="{{ showLangSwitch }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:5px;height:28px;padding:0 9px;border-radius:7px;border:1px solid #e6e6ee;font-size:12px;font-weight:600;color:#4a4c5e"><i class="icon-languages" style="font-size:13px"></i>{{ langCode }}</div></sc-if>
+            <div style="width:30px;height:30px;border-radius:50%;background:#e3f5ef;color:#0e7c66;display:grid;place-items:center;font-size:11px;font-weight:700">{{ userInitials }}</div>
+          </div>
+        </div>
+        <div style="padding:40px 30px 34px;display:flex;flex-direction:column;gap:36px">
+          <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="3">
+            <div onClick="{{ b.onSelect }}" style="position:relative;border-radius:10px;outline:{{ b.outline }};outline-offset:8px;cursor:{{ b.cursor }}">
+              <sc-if value="{{ b.isSel }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:-38px;left:-9px;display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:6px;background:#4f5bea;color:#fff;font-size:11.5px;font-weight:600;white-space:nowrap"><i class="{{ b.tagIcon }}" style="font-size:12px"></i>{{ b.tag }}</div>
+                <div style="position:absolute;top:-40px;right:-9px;display:flex;gap:1px;padding:2px;border-radius:8px;background:#fff;border:1px solid #e1e1ea;box-shadow:0 2px 8px rgba(20,20,40,.08);z-index:2">
+                  <button title="Move up" onClick="{{ b.onUp }}" style="width:24px;height:22px;border:none;background:transparent;border-radius:5px;cursor:pointer;display:grid;place-items:center;color:#4a4c5e" style-hover="background:#f2f2f6"><i class="icon-arrow-up" style="font-size:13px"></i></button>
+                  <button title="Move down" onClick="{{ b.onDown }}" style="width:24px;height:22px;border:none;background:transparent;border-radius:5px;cursor:pointer;display:grid;place-items:center;color:#4a4c5e" style-hover="background:#f2f2f6"><i class="icon-arrow-down" style="font-size:13px"></i></button>
+                  <button title="Duplicate" onClick="{{ b.onDup }}" style="width:24px;height:22px;border:none;background:transparent;border-radius:5px;cursor:pointer;display:grid;place-items:center;color:#4a4c5e" style-hover="background:#f2f2f6"><i class="icon-copy" style="font-size:13px"></i></button>
+                  <button title="Delete" onClick="{{ b.onDel }}" style="width:24px;height:22px;border:none;background:transparent;border-radius:5px;cursor:pointer;display:grid;place-items:center;color:#b42318" style-hover="background:#fff1f0"><i class="icon-trash-2" style="font-size:13px"></i></button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.hasRestricted }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:-26px;right:0;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#6b3fc9"><i class="icon-lock" style="font-size:11px"></i>Visible to {{ b.restricted }}</div></sc-if>
+
+              <sc-if value="{{ b.isHeader }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                  <div style="min-width:0"><h1 style="margin:0;font-size:27px;font-weight:800;letter-spacing:-.02em;text-wrap:balance">{{ b.title }}</h1><sc-if value="{{ b.hasSubtitle }}" hint-placeholder-val="{{ true }}"><p style="margin:6px 0 0;color:#6b6d80;font-size:14.5px;text-wrap:pretty">{{ b.subtitle }}</p></sc-if></div>
+                  <sc-if value="{{ b.hasButton }}" hint-placeholder-val="{{ false }}"><button style="display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:9px;border:none;background:#0e7c66;color:#fff;font-weight:700;font-size:13.5px;cursor:pointer"><i class="icon-plus" style="font-size:15px"></i>{{ b.buttonLabel }}</button></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isStats }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+                  <sc-for list="{{ b.items }}" as="it" hint-placeholder-count="3">
+                    <div style="border:1px solid #ececf2;border-radius:12px;padding:16px 18px;background:#fcfcfd">
+                      <div style="font-size:12.5px;color:#6b6d80;font-weight:600">{{ it.label }}</div>
+                      <div style="font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px;color:{{ it.color }}">{{ it.value }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isTable }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid #ececf2;border-radius:12px;overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid #ececf2;flex-wrap:wrap">
+                    <div style="font-weight:700;font-size:15px">{{ b.title }}</div><div style="font-size:12.5px;color:#8a8c9c">{{ b.count }}</div>
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:1px solid #e6e6ee;border-radius:8px;color:#9a9cab;font-size:13px;min-width:150px"><i class="icon-search" style="font-size:14px"></i>Search</div>
+                  </div>
+                  <div style="overflow-x:auto">
+                    <div style="min-width:{{ b.minW }}">
+                      <div style="display:grid;grid-template-columns:{{ b.grid }};background:#fafafc;border-bottom:1px solid #ececf2">
+                        <sc-for list="{{ b.cols }}" as="c" hint-placeholder-count="5"><div style="padding:10px 16px;font-size:12px;font-weight:600;color:#6b6d80;white-space:nowrap">{{ c.label }}</div></sc-for>
+                      </div>
+                      <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="4">
+                        <div style="display:grid;grid-template-columns:{{ b.grid }};border-bottom:1px solid #f1f1f5;font-size:13.5px" style-hover="background:#fafafc">
+                          <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="5"><div style="padding:11px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                            <sc-if value="{{ x.pill }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;background:{{ x.bg }};color:{{ x.fg }}">{{ x.text }}</span></sc-if>
+                            <sc-if value="{{ x.plain }}" hint-placeholder-val="{{ true }}"><span style="color:{{ x.fg }}">{{ x.text }}</span></sc-if>
+                          </div></sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <sc-if value="{{ b.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:28px;text-align:center;color:#8a8c9c;font-size:13.5px">No records to show for this user.</div></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isForm }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid #ececf2;border-radius:12px;padding:20px;max-width:560px">
+                  <div style="font-weight:700;font-size:16px;margin-bottom:14px">{{ b.title }}</div>
+                  <div style="display:flex;flex-direction:column;gap:12px">
+                    <sc-for list="{{ b.fields }}" as="f" hint-placeholder-count="3"><div><div style="font-size:12.5px;font-weight:600;color:#4a4c5e;margin-bottom:5px">{{ f.label }}{{ f.req }}</div><div style="height:38px;border:1px solid #e1e1ea;border-radius:8px;padding:0 12px;display:flex;align-items:center;color:#a5a7b5;font-size:13.5px">{{ f.ph }}</div></div></sc-for>
+                  </div>
+                  <button style="margin-top:16px;height:38px;padding:0 16px;border-radius:9px;border:none;background:#0e7c66;color:#fff;font-weight:700;font-size:13.5px">{{ b.submit }}</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isText }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0;font-size:15px;line-height:1.6;color:#3a3c4e;max-width:680px;text-wrap:pretty">{{ b.text }}</p>
+              </sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ isEditor }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ openAdd }}" style="height:44px;border-radius:10px;border:1.5px dashed #d6d7e2;background:transparent;color:#6b6d80;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px" style-hover="border-color:#4f5bea;color:#4f5bea;background:#fafaff"><i class="icon-plus" style="font-size:15px"></i>Add block</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showRight }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:none;display:flex;border-left:1px solid #e8e8ef;background:#fff;min-height:0">
+    <sc-if value="{{ showProps }}" hint-placeholder-val="{{ false }}">
+    <div style="width:{{ propsW }};display:flex;flex-direction:column;min-height:0;border-right:{{ propsBorder }}">
+      <sc-if value="{{ rightTabsMode }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:4px;padding:10px;border-bottom:1px solid #efeff4">
+          <sc-for list="{{ rightTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.go }}" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}"><i class="{{ t.icon }}" style="font-size:14px"></i>{{ t.label }}<sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#4f5bea;color:#fff;font-size:10.5px;display:grid;place-items:center">{{ t.badge }}</span></sc-if></button></sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;overflow:auto">
+        <sc-if value="{{ sel.none }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:48px 28px;text-align:center;color:#6b6d80">
+            <div style="width:44px;height:44px;border-radius:12px;background:#f2f3ff;color:#4f5bea;display:grid;place-items:center;margin:0 auto 14px"><i class="icon-mouse-pointer-click" style="font-size:20px"></i></div>
+            <div style="font-weight:700;color:#17182a;font-size:14.5px">Select a block to edit it</div>
+            <p style="font-size:13px;line-height:1.55;margin:8px 0 0;text-wrap:pretty">Every change updates the app definition — the preview and Studio AI see it right away.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ sel.has }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #efeff4">
+            <div style="width:34px;height:34px;border-radius:9px;background:#f2f3ff;color:#4f5bea;display:grid;place-items:center;flex:none"><i class="{{ sel.icon }}"></i></div>
+            <div style="min-width:0"><div style="font-weight:700;font-size:14px">{{ sel.typeLabel }}</div><div style="font-size:12px;color:#8a8c9c">On the {{ sel.pageName }} page</div></div>
+          </div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:18px">
+            <sc-if value="{{ sel.hasTitle }}" hint-placeholder-val="{{ false }}">
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">{{ sel.titleLabel }}</div><input value="{{ sel.title }}" onChange="{{ sel.onTitle }}" style="width:100%;height:36px;padding:0 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;background:#fff;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></label>
+            </sc-if>
+            <sc-if value="{{ sel.isHeader }}" hint-placeholder-val="{{ false }}">
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Subtitle</div><textarea value="{{ sel.subtitle }}" onChange="{{ sel.onSubtitle }}" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;line-height:1.45;resize:vertical;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></textarea></label>
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Main button label <span style="font-weight:400;color:#9a9cab">· leave empty to hide</span></div><input value="{{ sel.button }}" onChange="{{ sel.onButton }}" style="width:100%;height:36px;padding:0 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></label>
+              <div><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Who can use the button</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ sel.buttonRoleChips }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.toggle }}" style="height:28px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sel.hasSource }}" hint-placeholder-val="{{ false }}">
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Data from</div>
+                <select value="{{ sel.source }}" onChange="{{ sel.onSource }}" style="width:100%;height:36px;padding:0 8px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;background:#fff;outline:none">
+                  <sc-for list="{{ sel.sourceOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+              </label>
+              <div><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">{{ sel.colsLabel }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ sel.colOptions }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.toggle }}" style="height:28px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sel.isTable }}" hint-placeholder-val="{{ false }}">
+              <div><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Show records</div>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <sc-for list="{{ sel.filterOptions }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.go }}" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;border:none;background:transparent;cursor:pointer;text-align:left;font-size:13px" style-hover="background:#f5f5f8"><span style="width:16px;height:16px;border-radius:50%;border:{{ o.ring }};flex:none"></span>{{ o.label }}</button></sc-for>
+                </div>
+                <div style="margin-top:8px;font-size:12px;line-height:1.5;color:#6b6d80;display:flex;gap:7px"><i class="icon-shield-check" style="font-size:13px;color:#6b3fc9;margin-top:2px"></i><span>Record visibility rules always apply on top of this filter.</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sel.isStats }}" hint-placeholder-val="{{ false }}">
+              <div><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Numbers to show</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ sel.statOptions }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.toggle }}" style="height:28px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+                <div style="margin-top:8px;font-size:12px;color:#6b6d80">Counted from Work orders.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ sel.isForm }}" hint-placeholder-val="{{ false }}">
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Submit button</div><input value="{{ sel.submit }}" onChange="{{ sel.onSubmit }}" style="width:100%;height:36px;padding:0 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></label>
+            </sc-if>
+            <sc-if value="{{ sel.isText }}" hint-placeholder-val="{{ false }}">
+              <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Text</div><textarea value="{{ sel.text }}" onChange="{{ sel.onText }}" rows="5" style="width:100%;padding:8px 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></textarea></label>
+            </sc-if>
+            <div style="border-top:1px solid #efeff4;padding-top:16px"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Visible to</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ sel.roleChips }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.toggle }}" style="height:28px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+            </div>
+          </div>
+          <div style="padding:4px 16px 20px;display:flex;flex-direction:column;gap:8px">
+            <button onClick="{{ sel.askAi }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:9px;border:1px solid #dfe2ff;background:#f7f8ff;color:#3f4bd8;font-size:13px;font-weight:600;cursor:pointer"><i class="icon-sparkles" style="font-size:14px"></i>Ask AI about this block</button>
+            <button onClick="{{ sel.viewDef }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;border:none;background:transparent;color:#6b6d80;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-code-xml" style="font-size:13px"></i>View definition</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ showAi }}" hint-placeholder-val="{{ true }}">
+    <div style="width:{{ aiW }};display:flex;flex-direction:column;min-height:0">
+      <sc-if value="{{ rightTabsMode }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:4px;padding:10px;border-bottom:1px solid #efeff4">
+          <sc-for list="{{ rightTabs }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.go }}" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}"><i class="{{ t.icon }}" style="font-size:14px"></i>{{ t.label }}<sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#4f5bea;color:#fff;font-size:10.5px;display:grid;place-items:center">{{ t.badge }}</span></sc-if></button></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ rightStacked }}" hint-placeholder-val="{{ false }}">
+        <div style="height:53px;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid #efeff4;font-weight:700;font-size:13.5px"><i class="icon-sparkles" style="color:#4f5bea"></i>Studio AI</div>
+      </sc-if>
+      <div ref="{{ msgRef }}" style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px;background:#fcfcfe">
+        <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+              <div style="align-self:flex-end;max-width:88%;padding:10px 13px;border-radius:12px 12px 4px 12px;background:#4f5bea;color:#fff;font-size:13.5px;line-height:1.5">{{ m.text }}</div>
+            </sc-if>
+            <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:9px;align-items:flex-start">
+                <div style="width:26px;height:26px;border-radius:8px;background:#eef0ff;color:#4f5bea;display:grid;place-items:center;flex:none"><i class="icon-sparkles" style="font-size:13px"></i></div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                  <sc-if value="{{ m.hasNote }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;padding:9px 11px;border-radius:9px;background:#f4f5f8;font-size:12.5px;line-height:1.5;color:#4a4c5e"><i class="icon-eye" style="font-size:13px;margin-top:2px;color:#6b6d80"></i><span>{{ m.note }}</span></div></sc-if>
+                  <div style="font-size:13.5px;line-height:1.55;color:#24253a;text-wrap:pretty">{{ m.text }}</div>
+                  <sc-if value="{{ m.hasPlan }}" hint-placeholder-val="{{ false }}">
+                    <div style="border:1px solid #e3e3ea;border-radius:12px;background:#fff;overflow:hidden">
+                      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #efeff4;font-size:12.5px;font-weight:700"><i class="icon-list-checks" style="font-size:14px;color:#4f5bea"></i>{{ m.planTitle }}<span style="margin-left:auto;font-weight:600;color:{{ m.statusFg }}">{{ m.statusLabel }}</span></div>
+                      <sc-for list="{{ m.items }}" as="it" hint-placeholder-count="3">
+                        <div style="display:flex;gap:10px;padding:11px 12px;border-bottom:1px solid #f3f3f6;opacity:{{ it.opacity }}">
+                          <sc-if value="{{ it.isPending }}" hint-placeholder-val="{{ true }}"><button onClick="{{ it.toggle }}" style="width:18px;height:18px;border-radius:5px;border:1.5px solid {{ it.boxBorder }};background:{{ it.boxBg }};flex:none;cursor:pointer;display:grid;place-items:center;padding:0;margin-top:1px;color:#fff"><i class="icon-check" style="font-size:12px"></i></button></sc-if>
+                          <sc-if value="{{ it.isApplied }}" hint-placeholder-val="{{ false }}"><div style="width:18px;height:18px;border-radius:50%;background:#1c9a57;color:#fff;display:grid;place-items:center;flex:none;margin-top:1px"><i class="icon-check" style="font-size:11px"></i></div></sc-if>
+                          <sc-if value="{{ it.isSkipped }}" hint-placeholder-val="{{ false }}"><div style="width:18px;height:18px;border-radius:50%;background:#e6e6ee;color:#8a8c9c;display:grid;place-items:center;flex:none;margin-top:1px"><i class="icon-minus" style="font-size:11px"></i></div></sc-if>
+                          <div style="flex:1;min-width:0">
+                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:5px;font-size:11px;font-weight:700;background:{{ it.areaBg }};color:{{ it.areaFg }}"><i class="{{ it.iconCls }}" style="font-size:11px"></i>{{ it.area }}</span></div>
+                            <div style="font-size:13px;font-weight:600;line-height:1.4">{{ it.title }}</div>
+                            <div style="font-size:12px;color:#6b6d80;line-height:1.45;margin-top:3px">{{ it.detail }}</div>
+                            <button onClick="{{ it.toggleMeta }}" style="margin-top:5px;padding:0;border:none;background:none;color:#4f5bea;font-size:11.5px;font-weight:600;cursor:pointer">{{ it.metaLabel }}</button>
+                            <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}"><div style="margin-top:6px;padding:8px 10px;border-radius:7px;background:#15161f;color:#c9cbe0;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.55;white-space:pre-wrap;word-break:break-word">{{ it.meta }}</div></sc-if>
+                          </div>
+                        </div>
+                      </sc-for>
+                      <sc-if value="{{ m.pending }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;gap:8px;padding:10px 12px;background:#fafafc">
+                          <button onClick="{{ m.onApply }}" style="flex:1;height:34px;border-radius:8px;border:none;background:#4f5bea;color:#fff;font-size:13px;font-weight:700;cursor:pointer" style-hover="background:#4350e0">{{ m.applyLabel }}</button>
+                          <button onClick="{{ m.onDismiss }}" style="height:34px;padding:0 12px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Discard</button>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ m.hasLinks }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <button onClick="{{ goPreview }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-play" style="font-size:12px"></i>Open preview</button>
+                      <button onClick="{{ goReleases }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-git-compare" style="font-size:12px"></i>See all changes</button>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ thinking }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:9px;align-items:center"><div style="width:26px;height:26px;border-radius:8px;background:#eef0ff;color:#4f5bea;display:grid;place-items:center"><i class="icon-sparkles" style="font-size:13px"></i></div><div style="font-size:12.5px;color:#6b6d80">Reading your app definition</div>{{ dots }}</div>
+        </sc-if>
+        <sc-if value="{{ showSuggestions }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:6px;padding-left:35px">
+            <sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="3"><button onClick="{{ sg.go }}" style="text-align:left;padding:8px 11px;border-radius:9px;border:1px solid #e3e3ea;background:#fff;font-size:12.5px;font-weight:500;color:#3f4bd8;cursor:pointer;line-height:1.4" style-hover="border-color:#c7ccff;background:#fafaff">{{ sg.label }}</button></sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ hasUnseen }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:9px 14px;border-top:1px solid #efeff4;background:#fbfbfd;font-size:12px;color:#4a4c5e;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#17182a"><i class="icon-eye" style="font-size:13px"></i>{{ unseenTitle }}</div>
+          <sc-for list="{{ unseen }}" as="u" hint-placeholder-count="1"><div style="padding-left:19px;color:#6b6d80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.text }}</div></sc-for>
+        </div>
+      </sc-if>
+      <div style="padding:12px;border-top:1px solid #efeff4">
+        <div style="border:1px solid #e1e1ea;border-radius:12px;background:#fff;padding:8px 8px 8px 12px;display:flex;align-items:flex-end;gap:8px" style-focus-within="border-color:#4f5bea">
+          <textarea value="{{ aiInput }}" onChange="{{ onAiInput }}" onKeyDown="{{ onAiKey }}" rows="2" placeholder="Describe a change… e.g. technicians should only see their own jobs" style="flex:1;border:none;outline:none;resize:none;font-size:13.5px;line-height:1.45;background:transparent;padding:2px 0"></textarea>
+          <button onClick="{{ send }}" style="width:34px;height:34px;border-radius:9px;border:none;background:#4f5bea;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none"><i class="icon-arrow-up" style="font-size:16px"></i></button>
+        </div>
+        <div style="font-size:11px;color:#9a9cab;margin-top:7px;padding-left:2px">AI proposes a plan first. Nothing changes until you apply it.</div>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isData }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex">
+  <div style="width:236px;flex:none;background:#fff;border-right:1px solid #e8e8ef;padding:14px 10px;overflow:auto">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9cab;padding:0 10px 8px">Tables</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ tableList }}" as="t" hint-placeholder-count="4">
+        <div onClick="{{ t.go }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;background:{{ t.bg }};color:{{ t.fg }}" style-hover="background:#f5f5f8"><i class="{{ t.icon }}" style="font-size:15px"></i><div style="flex:1;font-size:13.5px;font-weight:600">{{ t.label }}</div><span style="font-size:11.5px;color:#8a8c9c">{{ t.count }}</span></div>
+      </sc-for>
+    </div>
+    <button style="margin:8px 0 0;width:100%;height:34px;border-radius:8px;border:1px dashed #d6d7e2;background:transparent;color:#6b6d80;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px"><i class="icon-plus" style="font-size:14px"></i>New table</button>
+    <div style="margin:22px 4px 0;padding:14px;border-radius:12px;background:#f7f7fb;font-size:12.5px;line-height:1.55;color:#4a4c5e">
+      <div style="font-weight:700;color:#17182a;margin-bottom:6px">Structure vs. records</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px"><i class="icon-layers" style="font-size:14px;color:#4f5bea;margin-top:2px"></i><span><b>Structure</b> (tables, fields, links) is part of the app and ships with releases.</span></div>
+      <div style="display:flex;gap:8px"><i class="icon-database" style="font-size:14px;color:#0e7c66;margin-top:2px"></i><span><b>Records</b> belong to each environment. Copying or releasing the app never copies them.</span></div>
+    </div>
+  </div>
+  <div style="flex:1;min-width:0;overflow:auto;padding:24px 28px 48px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="width:40px;height:40px;border-radius:10px;background:#e3f5ef;color:#0e7c66;display:grid;place-items:center"><i class="{{ dtIcon }}" style="font-size:19px"></i></div>
+      <div><h1 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em">{{ dtName }}</h1><div style="font-size:12px;color:#8a8c9c;font-family:'JetBrains Mono',monospace;margin-top:2px">{{ dtId }}</div></div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:#eef0ff;color:#3f4bd8;font-size:12px;font-weight:700"><i class="icon-layers" style="font-size:13px"></i>Structure · {{ dtFieldCount }}</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:#e3f5ef;color:#0e7c66;font-size:12px;font-weight:700"><i class="icon-database" style="font-size:13px"></i>Records in Development · {{ dtRecordCount }}</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin:22px 0 16px;border-bottom:1px solid #e8e8ef">
+      <sc-for list="{{ dataTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.go }}" style="height:38px;padding:0 12px;border:none;background:transparent;cursor:pointer;font-size:13.5px;font-weight:600;color:{{ t.fg }};border-bottom:2px solid {{ t.line }};margin-bottom:-1px">{{ t.label }}</button></sc-for>
+      <button onClick="{{ startAddField }}" style="margin-left:auto;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer;margin-bottom:6px"><i class="icon-plus" style="font-size:13px"></i>Add field</button>
+    </div>
+    <sc-if value="{{ adding }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;padding:14px;border:1px solid #c7ccff;background:#fafaff;border-radius:12px;margin-bottom:16px">
+        <label style="flex:1;min-width:180px"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Field name</div><input value="{{ newName }}" onChange="{{ onNewName }}" placeholder="e.g. Customer signature" style="width:100%;height:36px;padding:0 10px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;outline:none"></label>
+        <label style="min-width:180px"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Type</div><select value="{{ newType }}" onChange="{{ onNewType }}" style="width:100%;height:36px;padding:0 8px;border:1px solid #e1e1ea;border-radius:8px;font-size:13.5px;background:#fff"><sc-for list="{{ fieldTypes }}" as="ft" hint-placeholder-count="6"><option value="{{ ft }}">{{ ft }}</option></sc-for></select></label>
+        <button onClick="{{ addField }}" style="height:36px;padding:0 14px;border-radius:8px;border:none;background:#4f5bea;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Add field</button>
+        <button onClick="{{ cancelAdd }}" style="height:36px;padding:0 12px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+        <div style="flex-basis:100%;font-size:12px;color:#6b6d80">Adds to the app structure. Existing {{ dtRecordCount }} records get an empty value — nothing is deleted.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ dataRecords }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:auto">
+        <div style="min-width:{{ dataMinW }}">
+          <div style="display:grid;grid-template-columns:{{ dataGrid }};background:#fafafc;border-bottom:1px solid #ececf2">
+            <sc-for list="{{ dataCols }}" as="c" hint-placeholder-count="6"><div style="padding:10px 14px;font-size:12px;font-weight:600;color:#6b6d80;white-space:nowrap;display:flex;align-items:center;gap:6px"><i class="{{ c.icon }}" style="font-size:12px;opacity:.7"></i>{{ c.label }}</div></sc-for>
+          </div>
+          <sc-for list="{{ dataRows }}" as="r" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:{{ dataGrid }};border-bottom:1px solid #f1f1f5;font-size:13px" style-hover="background:#fafafc">
+              <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="6"><div style="padding:10px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-right:1px solid #f4f4f7">
+                <sc-if value="{{ x.pill }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:999px;font-size:11.5px;font-weight:600;background:{{ x.bg }};color:{{ x.fg }}">{{ x.text }}</span></sc-if>
+                <sc-if value="{{ x.plain }}" hint-placeholder-val="{{ true }}"><span style="color:{{ x.fg }}">{{ x.text }}</span></sc-if>
+              </div></sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ dataFields }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1.3fr);background:#fafafc;border-bottom:1px solid #ececf2;font-size:12px;font-weight:600;color:#6b6d80">
+          <div style="padding:10px 16px">Field</div><div style="padding:10px 16px">Type</div><div style="padding:10px 16px">Required</div><div style="padding:10px 16px">Used on pages</div>
+        </div>
+        <sc-for list="{{ fieldRows }}" as="f" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1.3fr);border-bottom:1px solid #f1f1f5;font-size:13px;align-items:center">
+            <div style="padding:11px 16px"><div style="font-weight:600">{{ f.name }}</div><div style="font-size:11px;color:#9a9cab;font-family:'JetBrains Mono',monospace;margin-top:2px">{{ f.key }}</div></div>
+            <div style="padding:11px 16px"><span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:6px;background:#f4f5f8;font-size:12px;font-weight:600;color:#4a4c5e"><i class="{{ f.icon }}" style="font-size:12px"></i>{{ f.type }}</span></div>
+            <div style="padding:11px 16px;color:#6b6d80">{{ f.req }}</div>
+            <div style="padding:11px 16px;color:#6b6d80">{{ f.used }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ dataRels }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ rels }}" as="r" hint-placeholder-count="2">
+          <div style="display:flex;align-items:center;gap:14px;padding:16px;background:#fff;border:1px solid #e8e8ef;border-radius:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:9px;background:#e3f5ef;color:#0e7c66;font-weight:700;font-size:13px">{{ r.a }}</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:110px"><span style="font-size:11px;font-weight:700;color:#6b6d80">{{ r.kind }}</span><div style="width:100%;height:2px;background:#d6d7e2;border-radius:2px"></div></div>
+            <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:9px;background:#eef0ff;color:#3f4bd8;font-weight:700;font-size:13px">{{ r.b }}</div>
+            <div style="flex:1;min-width:200px;font-size:13px;color:#4a4c5e">{{ r.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isReleases }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex">
+  <div style="width:260px;flex:none;background:#fff;border-right:1px solid #e8e8ef;padding:14px 10px;overflow:auto">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9cab;padding:0 10px 8px">Versions</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ relList }}" as="v" hint-placeholder-count="4">
+        <div onClick="{{ v.go }}" style="padding:9px 10px;border-radius:8px;cursor:pointer;background:{{ v.bg }}" style-hover="background:#f5f5f8">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13.5px;font-weight:700;color:{{ v.fg }}">{{ v.label }}</span><span style="margin-left:auto;display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:999px;font-size:10.5px;font-weight:700;background:{{ v.envBg }};color:{{ v.envFg }}">{{ v.env }}</span></div>
+          <div style="font-size:11.5px;color:#8a8c9c;margin-top:2px">{{ v.sub }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="flex:1;min-width:0;overflow:auto;padding:24px 28px 48px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px">
+      <sc-for list="{{ pipeline }}" as="e" hint-placeholder-count="3">
+        <div style="padding:14px 16px;border-radius:12px;background:#fff;border:1px solid #e8e8ef;display:flex;align-items:center;gap:12px">
+          <div style="width:34px;height:34px;border-radius:9px;background:{{ e.bg }};color:{{ e.fg }};display:grid;place-items:center"><i class="{{ e.icon }}"></i></div>
+          <div style="min-width:0"><div style="font-size:12px;color:#6b6d80;font-weight:600">{{ e.label }}</div><div style="font-size:14px;font-weight:700">{{ e.value }}</div><div style="font-size:11.5px;color:#8a8c9c">{{ e.sub }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <div><h1 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em">{{ relTitle }}</h1><div style="font-size:13px;color:#6b6d80;margin-top:4px">{{ relSub }}</div></div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:8px">
+          <sc-for list="{{ relViews }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.go }}" style="height:28px;padding:0 11px;border-radius:6px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.shadow }}">{{ t.label }}</button></sc-for>
+        </div>
+        <sc-if value="{{ relIsDraft }}" hint-placeholder-val="{{ true }}"><button onClick="{{ openRelease }}" style="display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:9px;border:none;background:#4f5bea;color:#fff;font-size:13px;font-weight:700;cursor:pointer"><i class="icon-rocket" style="font-size:14px"></i>Prepare release</button></sc-if>
+      </div>
+    </div>
+    <sc-if value="{{ relEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:40px;text-align:center;background:#fff;border:1px dashed #d6d7e2;border-radius:12px;color:#6b6d80;font-size:13.5px">No unreleased changes. Edit a page or ask Studio AI, and changes collect here.</div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ relGroups }}" as="g" hint-placeholder-count="2">
+        <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid #efeff4"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:700;background:{{ g.bg }};color:{{ g.fg }}">{{ g.area }}</span><span style="font-size:12px;color:#8a8c9c">{{ g.count }}</span></div>
+          <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f4f4f7">
+              <span style="width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-weight:800;background:{{ c.whoBg }};color:{{ c.whoFg }};flex:none">{{ c.who }}</span>
+              <sc-if value="{{ relFriendly }}" hint-placeholder-val="{{ true }}"><div style="flex:1;font-size:13.5px">{{ c.text }}</div></sc-if>
+              <sc-if value="{{ relMetaView }}" hint-placeholder-val="{{ false }}"><div style="flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ c.metaFg }};word-break:break-word">{{ c.meta }}</div></sc-if>
+              <span style="font-size:11.5px;color:#9a9cab;white-space:nowrap">{{ c.time }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMeta }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex">
+  <div style="width:260px;flex:none;background:#fff;border-right:1px solid #e8e8ef;padding:14px 10px;overflow:auto">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9a9cab;padding:0 10px 10px"><i class="icon-code-xml" style="font-size:12px"></i>App definition</div>
+    <sc-for list="{{ metaNodes }}" as="n" hint-placeholder-count="8">
+      <div>
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;font-weight:700;color:#6b6d80;padding:12px 10px 4px">{{ n.label }}</div></sc-if>
+        <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}"><div onClick="{{ n.go }}" style="padding:7px 10px 7px {{ n.pad }};border-radius:7px;cursor:pointer;background:{{ n.bg }}" style-hover="background:#f5f5f8"><div style="font-size:13px;font-weight:600;color:{{ n.fg }}">{{ n.label }}</div><div style="font-size:11px;color:#9a9cab;font-family:'JetBrains Mono',monospace">{{ n.id }}</div></div></sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <div style="flex:1;min-width:0;overflow:auto;padding:24px 28px 48px">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+      <div><div style="font-size:12px;color:#8a8c9c;font-family:'JetBrains Mono',monospace">{{ metaPath }}</div><h1 style="margin:2px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em">{{ metaLabel }}</h1></div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <sc-if value="{{ metaCanOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ metaOpen }}" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid #e1e1ea;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer"><i class="icon-pencil-ruler" style="font-size:13px"></i>Open in visual editor</button></sc-if>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:10px;background:#fff8ea;border:1px solid #f6e3bd;font-size:12.5px;line-height:1.5;color:#6b4a0a;margin-bottom:14px"><i class="icon-info" style="font-size:14px;margin-top:2px"></i><span>Advanced view of the same definition the visual editors and Studio AI change. It updates live; records are never part of it.</span></div>
+    <div style="background:#15161f;border-radius:12px;padding:16px 0;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;overflow:auto">
+      <sc-for list="{{ metaLines }}" as="l" hint-placeholder-count="20"><div style="display:flex;white-space:pre;padding-right:16px"><span style="width:46px;flex:none;text-align:right;padding-right:16px;color:#545772">{{ l.n }}</span><span>{{ l.ind }}</span><span style="color:#a5b4ff">{{ l.key }}</span><span style="color:#8d90ad">{{ l.sep }}</span><span style="color:{{ l.vc }}">{{ l.val }}</span></div></sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ modalGenerate }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(20,20,35,.4);display:grid;place-items:center;z-index:50;padding:24px">
+  <div onClick="{{ stop }}" style="width:min(680px,100%);max-height:100%;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(20,20,40,.25)">
+    <div style="padding:22px 24px 14px">
+      <div style="display:flex;align-items:center;gap:8px;color:#4f5bea;font-size:12.5px;font-weight:700"><i class="icon-sparkles" style="font-size:14px"></i>Draft from your description</div>
+      <h2 style="margin:8px 0 4px;font-size:21px;font-weight:800;letter-spacing:-.02em">Here’s the app I’ll set up</h2>
+      <p style="margin:0;color:#6b6d80;font-size:13.5px">Review the outline. You can change any part later in the Studio.</p>
+    </div>
+    <div style="padding:6px 24px 4px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+      <sc-for list="{{ genSections }}" as="g" hint-placeholder-count="4">
+        <div style="border:1px solid #ececf2;border-radius:12px;padding:14px">
+          <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;margin-bottom:8px"><i class="{{ g.icon }}" style="color:#4f5bea"></i>{{ g.title }}</div>
+          <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="3"><div style="font-size:13px;color:#4a4c5e;padding:3px 0;line-height:1.4">{{ i }}</div></sc-for>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin:12px 24px 0;display:flex;gap:9px;padding:11px 13px;border-radius:10px;background:#f4fbf7;font-size:12.5px;line-height:1.5;color:#1f5a3c"><i class="icon-database" style="font-size:14px;margin-top:2px"></i><span>I’ll add a few sample records so you can preview. They stay in Development and are never part of a release.</span></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:18px 24px 22px">
+      <button onClick="{{ closeModal }}" style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #e1e1ea;background:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Back</button>
+      <button onClick="{{ createApp }}" style="height:38px;padding:0 16px;border-radius:9px;border:none;background:#4f5bea;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer">Create app and open Studio</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalCopy }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(20,20,35,.4);display:grid;place-items:center;z-index:50;padding:24px">
+  <div onClick="{{ stop }}" style="width:min(520px,100%);background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(20,20,40,.25)">
+    <div style="padding:22px 24px 6px">
+      <h2 style="margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.02em">Duplicate app</h2>
+      <p style="margin:0;color:#6b6d80;font-size:13.5px">Copy of {{ copyFrom }}</p>
+    </div>
+    <div style="padding:14px 24px;display:flex;flex-direction:column;gap:12px">
+      <label style="display:block"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">New app name</div><input value="{{ copyName }}" onChange="{{ onCopyName }}" style="width:100%;height:38px;padding:0 11px;border:1px solid #e1e1ea;border-radius:9px;font-size:14px;outline:none"></label>
+      <div style="display:flex;gap:12px;padding:13px;border-radius:12px;border:1px solid #c7ccff;background:#fafaff">
+        <div style="width:20px;height:20px;border-radius:6px;background:#4f5bea;color:#fff;display:grid;place-items:center;flex:none"><i class="icon-check" style="font-size:13px"></i></div>
+        <div><div style="font-weight:700;font-size:13.5px">App structure <span style="font-weight:600;color:#8a8c9c;font-size:12px">· always included</span></div><div style="font-size:12.5px;color:#6b6d80;margin-top:3px;line-height:1.45">Pages, tables and fields, workflows, rules, roles and translations.</div></div>
+      </div>
+      <div onClick="{{ toggleCopyRecords }}" style="display:flex;gap:12px;padding:13px;border-radius:12px;border:1px solid #e3e3ea;cursor:pointer">
+        <div style="width:34px;height:20px;border-radius:10px;background:{{ copyRecTrack }};position:relative;flex:none"><div style="position:absolute;top:2px;left:{{ copyRecKnob }};width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+        <div><div style="font-weight:700;font-size:13.5px">Also copy records</div><div style="font-size:12.5px;color:#6b6d80;margin-top:3px;line-height:1.45">{{ copyRecordsText }}</div></div>
+      </div>
+      <div onClick="{{ toggleCopyUsers }}" style="display:flex;gap:12px;padding:13px;border-radius:12px;border:1px solid #e3e3ea;cursor:pointer">
+        <div style="width:34px;height:20px;border-radius:10px;background:{{ copyUsrTrack }};position:relative;flex:none"><div style="position:absolute;top:2px;left:{{ copyUsrKnob }};width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+        <div><div style="font-weight:700;font-size:13.5px">Also copy users and role assignments</div><div style="font-size:12.5px;color:#6b6d80;margin-top:3px;line-height:1.45">Off: roles are copied, but nobody is invited to the new app.</div></div>
+      </div>
+      <sc-if value="{{ copyRecords }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:9px;padding:11px 13px;border-radius:10px;background:#fff8ea;font-size:12.5px;line-height:1.5;color:#6b4a0a"><i class="icon-triangle-alert" style="font-size:14px;margin-top:2px"></i><span>Records may include customer contact details. The copies are independent and won’t sync back.</span></div></sc-if>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:10px 24px 22px">
+      <button onClick="{{ closeModal }}" style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #e1e1ea;background:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button>
+      <button onClick="{{ doCopy }}" style="height:38px;padding:0 16px;border-radius:9px;border:none;background:#4f5bea;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer">{{ copyCta }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalRelease }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeModal }}" style="position:absolute;inset:0;background:rgba(20,20,35,.4);display:grid;place-items:center;z-index:50;padding:24px">
+  <div onClick="{{ stop }}" style="width:min(560px,100%);max-height:100%;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(20,20,40,.25)">
+    <div style="padding:22px 24px 6px">
+      <h2 style="margin:0 0 4px;font-size:20px;font-weight:800;letter-spacing:-.02em">Prepare a release</h2>
+      <p style="margin:0;color:#6b6d80;font-size:13.5px">{{ relCountText }}</p>
+    </div>
+    <div style="padding:14px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <label style="flex:1;min-width:140px"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Version</div><input value="{{ relVersion }}" onChange="{{ onRelVersion }}" style="width:100%;height:38px;padding:0 11px;border:1px solid #e1e1ea;border-radius:9px;font-size:14px;outline:none"></label>
+        <div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:600;color:#4a4c5e;margin-bottom:6px">Release to</div>
+          <div style="display:flex;gap:2px;background:#f2f2f6;padding:3px;border-radius:9px"><sc-for list="{{ relTargets }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.go }}" style="flex:1;height:32px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }};box-shadow:{{ t.shadow }}">{{ t.label }}</button></sc-for></div>
+        </div>
+      </div>
+      <div style="border:1px solid #ececf2;border-radius:12px;overflow:hidden">
+        <div style="padding:10px 14px;background:#fafafc;border-bottom:1px solid #ececf2;font-size:12.5px;font-weight:700">What happens</div>
+        <sc-for list="{{ relSteps }}" as="r" hint-placeholder-count="3"><div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid #f3f3f6;font-size:13px;line-height:1.45"><i class="{{ r.icon }}" style="font-size:14px;color:{{ r.color }};margin-top:2px"></i><span>{{ r.text }}</span></div></sc-for>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;padding:6px 24px 22px">
+      <button onClick="{{ closeModal }}" style="height:38px;padding:0 14px;border-radius:9px;border:1px solid #e1e1ea;background:#fff;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button>
+      <button onClick="{{ doRelease }}" style="height:38px;padding:0 16px;border-radius:9px;border:none;background:#4f5bea;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer">{{ relCta }}</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:11px;background:#17182a;color:#fff;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(20,20,40,.25);z-index:60"><i class="icon-circle-check" style="font-size:15px;color:#6ee7a8"></i>{{ toast }}</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;editorLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Classic&quot;,&quot;Side-by-side&quot;,&quot;Focus canvas&quot;],&quot;default&quot;:&quot;Classic&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Editor&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Project editor&quot;,&quot;Projects home&quot;],&quot;default&quot;:&quot;Project editor&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Editor&quot;}}">
+const ROLES=['Admin','Dispatcher','Technician','Customer'];
+const USERS={Admin:'Maya Chen',Dispatcher:'Jordan Lee',Technician:'Sam Ortiz',Customer:'Dana Brooks'};
+const INIT={Admin:'MC',Dispatcher:'JL',Technician:'SO',Customer:'DB'};
+const PILL={New:['#eef0f4','#4a4f63'],Scheduled:['#e8efff','#2f4fd6'],'In progress':['#fff3df','#9a5b00'],'Waiting on parts':['#f3ecff','#6b3fc9'],Done:['#e5f6ec','#1c7a45'],Urgent:['#ffe9e7','#b42318'],Normal:['#eef0f4','#4a4f63'],Low:['#f4f5f7','#7a7f91'],Nuevo:['#eef0f4','#4a4f63'],Programado:['#e8efff','#2f4fd6'],'En curso':['#fff3df','#9a5b00'],'Esperando piezas':['#f3ecff','#6b3fc9'],Hecho:['#e5f6ec','#1c7a45'],Urgente:['#ffe9e7','#b42318'],Baja:['#f4f5f7','#7a7f91']};
+const STATS={open:{l:'Open jobs',f:r=>r.status!=='Done',q:'status != done'},today:{l:'Due today',f:r=>r.due==='Oct 6',q:'due = today()'},waiting:{l:'Waiting on parts',f:r=>r.status==='Waiting on parts',q:'status = waiting_on_parts'},done:{l:'Completed',f:r=>r.status==='Done',q:'status = done'},urgent:{l:'Urgent',f:r=>r.priority==='Urgent'&&r.status!=='Done',accent:true,q:'priority = urgent and status != done',needs:'priority'},mine:{l:'Assigned to me',f:(r,u)=>r.tech===u,q:'technician = current_user()'}};
+const TYPE={header:{l:'Page header',i:'heading',c:'page_header'},stats:{l:'Numbers',i:'chart-column',c:'stat_group'},table:{l:'Table',i:'table',c:'data_table'},form:{l:'Form',i:'square-pen',c:'record_form'},text:{l:'Text',i:'text',c:'rich_text'}};
+const PALETTE=[['header','Title, subtitle and a main button'],['stats','Counts from your data'],['table','List records from a table'],['form','Create or edit a record'],['text','Instructions or context']];
+const AREA={Database:['#e3f5ef','#0e7c66','database'],Pages:['#eef0ff','#3f4bd8','layout-dashboard'],Rules:['#fff3df','#9a5b00','shield-check'],Permissions:['#f3ecff','#6b3fc9','lock'],Translations:['#ffe9e7','#b42318','languages'],Workflow:['#e6f3fa','#1f6f99','workflow']};
+const FTICON={'Auto number':'hash','Text':'type','Workflow state':'workflow','Date':'calendar','Number':'hash','Single select':'circle-chevron-down','Multi select':'list','Currency':'banknote','User account':'user','Checkbox':'square-check'};
+const FIELD_TYPES=['Text','Number','Date','Single select','Multi select','Checkbox','Currency','User account','Link to Customers','Link to Technicians'];
+const ES={'Dashboard':'Panel','Work orders':'Órdenes de trabajo','Customers':'Clientes','Technicians':'Técnicos','Open jobs':'Trabajos abiertos','Due today':'Para hoy','Waiting on parts':'Esperando piezas','Completed':'Completados','Urgent':'Urgente','Assigned to me':'Asignados a mí','Track every job from request to sign-off.':'Sigue cada trabajo desde la solicitud hasta el cierre.','New work order':'Nueva orden','All work orders':'Todas las órdenes','Active jobs':'Trabajos activos','Job':'Trabajo','Customer':'Cliente','Technician':'Técnico','Status':'Estado','Due':'Fecha límite','Priority':'Prioridad','Scheduled':'Programado','In progress':'En curso','Done':'Hecho','New':'Nuevo','Low':'Baja','Good morning, team':'Buenos días, equipo',"Here's what's happening across your field operations today.":'Esto es lo que pasa hoy en tus operaciones de campo.','Team':'Equipo','Who is on the team and where they work.':'Quién forma el equipo y dónde trabaja.','Region':'Región','Skills':'Habilidades','Name':'Nombre'};
+const PLANS={
+ pri:{intro:'Here’s my plan to add priorities. Uncheck anything you don’t want, then apply.',items:[
+  {id:'p1',area:'Database',title:'Add a “Priority” field to Work orders',detail:'Choices: Low, Normal, Urgent. Existing records get a value; nothing is deleted.',meta:'tables.work_orders.fields.priority = {\n  type: "single_select",\n  options: ["low","normal","urgent"],\n  default: "normal"\n}'},
+  {id:'p2',area:'Pages',title:'Show Priority in the work order lists',detail:'Adds a column next to Status in every Work orders table.',meta:'pages.*.blocks[data_table].columns += "priority"'},
+  {id:'p3',area:'Pages',title:'Add an “Urgent” number to the Work orders page',detail:'Counts open work orders marked Urgent.',meta:'pages.work_orders.blocks.o2.items += {\n  query: "count(work_orders where priority = urgent and status != done)"\n}'},
+  {id:'p4',area:'Rules',title:'Require a due date on urgent work orders',detail:'Saving without one shows: “Urgent jobs need a due date.”',meta:'validations.work_orders.urgent_needs_due = {\n  when: "priority = urgent", require: ["due"]\n}'},
+  {id:'p5',area:'Permissions',title:'Only Admins and Dispatchers can change Priority',detail:'Technicians and Customers can see it but not edit it.',meta:'permissions.work_orders.fields.priority.edit = ["admin","dispatcher"]'}]},
+ vis:{intro:'Here’s how I’d limit technicians to their own jobs:',items:[
+  {id:'v1',area:'Permissions',title:'Technicians see only work orders assigned to them',detail:'Applies everywhere: lists, numbers, search and exports. Admins and Dispatchers still see everything.',meta:'visibility.work_orders.technician = {\n  where: "technician = current_user()"\n}'},
+  {id:'v2',area:'Pages',title:'Hide the Technicians page from technicians',detail:'Removes it from their navigation.',meta:'pages.technicians.visible_to = ["admin","dispatcher"]'},
+  {id:'v3',area:'Pages',title:'Add “Assigned to me” to the Dashboard numbers',detail:'Each person sees the count of jobs assigned to them.',meta:'pages.dashboard.blocks.d2.items += {\n  query: "count(work_orders where technician = current_user())"\n}'}]},
+ tr:{intro:'I’ll add Spanish alongside English:',items:[
+  {id:'t1',area:'Translations',title:'Add Spanish (Español) as a language',detail:'English stays the default.',meta:'app.languages = ["en","es"]'},
+  {id:'t2',area:'Translations',title:'Translate page names, headings, columns and statuses',detail:'34 labels drafted. You can review each one later.',meta:'translations.es = {\n  "pages.work_orders.label": "Órdenes de trabajo",\n  "fields.status.options.done": "Hecho", …\n}'},
+  {id:'t3',area:'Pages',title:'Add a language switcher to the app header',detail:'Users can change language from the header.',meta:'app.header.language_switcher = true'}]}
+};
+const AFTER={pri:'Priority now shows in the work order lists, and urgent jobs need a due date.',vis:'Try Preview as Technician — Sam now sees only the jobs assigned to him.',tr:'Switch the preview language to Español to check the translations.'};
+const EFFECTS={
+ p1:s=>{const t=s.tables.orders;if(!t.fields.find(f=>f.key==='priority')){const i=t.fields.findIndex(f=>f.key==='status');t.fields.splice(i+1,0,{key:'priority',name:'Priority',type:'Single select'});}const pr=['Normal','Urgent','Urgent','Normal','Low','Normal','Low','Normal'];s.records.orders.forEach((r,i)=>{if(!r.priority)r.priority=pr[i%8];});s.hasPriority=true;},
+ p2:s=>s.pages.forEach(p=>p.blocks.forEach(b=>{if(b.type==='table'&&b.source==='orders'&&!b.columns.includes('priority')){const i=b.columns.indexOf('status');b.columns.splice(i<0?b.columns.length:i+1,0,'priority');}})),
+ p3:s=>s.pages.find(p=>p.id==='orders')?.blocks.forEach(b=>{if(b.type==='stats'&&!b.items.includes('urgent'))b.items.unshift('urgent');}),
+ p4:s=>s.rules.push({kind:'Validation',text:'Urgent work orders need a due date',roles:[]}),
+ p5:s=>s.rules.push({kind:'Permission',text:'Can view but not edit Priority',roles:['Technician','Customer']}),
+ v1:s=>{s.visRule=true;s.rules.push({kind:'Record visibility',text:'Only work orders assigned to them',roles:['Technician']});},
+ v2:s=>{const p=s.pages.find(p=>p.id==='techs');if(p)p.visibleTo=['Admin','Dispatcher'];},
+ v3:s=>s.pages.find(p=>p.id==='dashboard')?.blocks.forEach(b=>{if(b.type==='stats'&&!b.items.includes('mine'))b.items.unshift('mine');}),
+ t1:s=>{if(!s.langs.includes('Español'))s.langs.push('Español');},
+ t2:s=>{s.translated=true;},
+ t3:s=>{s.langSwitch=true;}
+};
+const snake=x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+const typeId=t=>t.startsWith('Link')?'link':snake(t);
+function seed(){
+ const o=(n,job,c,t,st,d,h)=>({ref:'WO-'+n,job,customer:c,tech:t,status:st,due:d,hours:h});
+ return {
+  tables:{
+   orders:{id:'work_orders',name:'Work orders',icon:'clipboard-list',fields:[{key:'ref',name:'#',type:'Auto number'},{key:'job',name:'Job',type:'Text',req:true},{key:'customer',name:'Customer',type:'Link to Customers',req:true,link:'customers'},{key:'tech',name:'Technician',type:'Link to Technicians',link:'technicians'},{key:'status',name:'Status',type:'Workflow state',req:true},{key:'due',name:'Due',type:'Date'},{key:'hours',name:'Hours logged',type:'Number'}]},
+   customers:{id:'customers',name:'Customers',icon:'building-2',fields:[{key:'name',name:'Company',type:'Text',req:true},{key:'contact',name:'Contact',type:'Text'},{key:'city',name:'City',type:'Text'},{key:'plan',name:'Service plan',type:'Single select'}]},
+   technicians:{id:'technicians',name:'Technicians',icon:'hard-hat',fields:[{key:'name',name:'Name',type:'Text',req:true},{key:'region',name:'Region',type:'Single select'},{key:'skills',name:'Skills',type:'Multi select'},{key:'login',name:'Login',type:'User account'}]},
+   parts:{id:'parts_used',name:'Parts used',icon:'package',fields:[{key:'part',name:'Part',type:'Text',req:true},{key:'order',name:'Work order',type:'Link to Work orders',link:'orders'},{key:'qty',name:'Quantity',type:'Number'},{key:'cost',name:'Unit cost',type:'Currency'}]}
+  },
+  records:{
+   orders:[o(1042,'HVAC quarterly inspection','Northwind Clinics','Sam Ortiz','Scheduled','Oct 6','0'),o(1043,'Replace rooftop compressor','Harbor Foods','Priya Nair','Waiting on parts','Oct 8','3.5'),o(1044,'Backup generator test','Northwind Clinics','Sam Ortiz','In progress','Oct 6','1.0'),o(1045,'Leak above server room','Lumen Data','Leo Brandt','New','Oct 7','0'),o(1046,'Install badge readers','Cedar Schools','Ana Costa','Scheduled','Oct 9','0'),o(1047,'Boiler pressure fault','Harbor Foods','Sam Ortiz','Done','Oct 3','2.0'),o(1048,'Fire alarm annual check','Cedar Schools','Priya Nair','Done','Oct 2','4.0'),o(1049,'Lighting retrofit, level 2','Lumen Data','Leo Brandt','In progress','Oct 10','6.5')],
+   customers:[{name:'Northwind Clinics',contact:'Dana Brooks',city:'Portland',plan:'Premium'},{name:'Harbor Foods',contact:'Luis Ortega',city:'Tacoma',plan:'Standard'},{name:'Lumen Data',contact:'Grace Kim',city:'Seattle',plan:'Premium'},{name:'Cedar Schools',contact:'Tom Avery',city:'Salem',plan:'Standard'},{name:'Alder Hotels',contact:'Nina Patel',city:'Eugene',plan:'Standard'}],
+   technicians:[{name:'Sam Ortiz',region:'North',skills:'HVAC, Electrical',login:'sam@fieldops.app'},{name:'Priya Nair',region:'South',skills:'Fire safety, HVAC',login:'priya@fieldops.app'},{name:'Leo Brandt',region:'Central',skills:'Electrical, Plumbing',login:'leo@fieldops.app'},{name:'Ana Costa',region:'Central',skills:'Access control',login:'ana@fieldops.app'}],
+   parts:[{part:'Compressor unit',order:'WO-1043',qty:'1',cost:'$2,140'},{part:'Air filter pack',order:'WO-1042',qty:'4',cost:'$36'},{part:'Pressure valve',order:'WO-1047',qty:'1',cost:'$180'},{part:'LED panel 60×60',order:'WO-1049',qty:'24',cost:'$58'}]
+  },
+  pages:[
+   {id:'dashboard',name:'Dashboard',icon:'layout-dashboard',visibleTo:['Admin','Dispatcher','Technician'],blocks:[
+    {id:'d1',type:'header',title:'Good morning, team',subtitle:"Here's what's happening across your field operations today.",button:'',buttonRoles:ROLES.slice()},
+    {id:'d2',type:'stats',items:['open','today','waiting','done']},
+    {id:'d3',type:'table',title:'Active jobs',source:'orders',columns:['ref','job','tech','status'],filter:'open'}]},
+   {id:'orders',name:'Work orders',icon:'clipboard-list',blocks:[
+    {id:'o1',type:'header',title:'Work orders',subtitle:'Track every job from request to sign-off.',button:'New work order',buttonRoles:['Admin','Dispatcher']},
+    {id:'o2',type:'stats',items:['open','waiting','done']},
+    {id:'o3',type:'table',title:'All work orders',source:'orders',columns:['ref','job','customer','tech','status','due'],filter:'none'}]},
+   {id:'customers',name:'Customers',icon:'building-2',visibleTo:['Admin','Dispatcher'],blocks:[
+    {id:'c1',type:'header',title:'Customers',subtitle:'Companies and sites you service.',button:'Add customer',buttonRoles:['Admin','Dispatcher']},
+    {id:'c2',type:'table',title:'All customers',source:'customers',columns:['name','contact','city','plan'],filter:'none'}]},
+   {id:'techs',name:'Technicians',icon:'hard-hat',visibleTo:['Admin','Dispatcher','Technician'],blocks:[
+    {id:'t1',type:'header',title:'Technicians',subtitle:'Who is on the team and where they work.',button:'',buttonRoles:ROLES.slice()},
+    {id:'t2',type:'table',title:'Team',source:'technicians',columns:['name','region','skills'],filter:'none'}]}],
+  rules:[{kind:'Record visibility',text:'Only their company’s work orders',roles:['Customer']},{kind:'Validation',text:'Done work orders need hours logged',roles:[]}],
+  visRule:false,langs:['English'],translated:false,langSwitch:false,hasPriority:false
+ };
+}
+const SEED_CHANGES=[{who:'You',area:'Pages',text:'Added “Due” column to All work orders',meta:'+ pages.work_orders.blocks.o3.columns += "due"',time:'Yesterday'},{who:'AI',area:'Workflow',text:'Added “Waiting on parts” state between In progress and Done',meta:'+ workflows.work_order.states.waiting_on_parts',time:'Yesterday'}];
+const VERSIONS=[
+ {v:'v1.4',env:'Production',date:'Sep 30',by:'Maya Chen',items:[{who:'AI',area:'Database',text:'Added Parts used table',meta:'+ tables.parts_used'},{who:'You',area:'Pages',text:'Added Technicians page',meta:'+ pages.technicians'},{who:'You',area:'Database',text:'Added Region field to Technicians',meta:'+ tables.technicians.fields.region'}]},
+ {v:'v1.3',env:'Archived',date:'Sep 12',by:'Maya Chen',items:[{who:'You',area:'Permissions',text:'Added Customer role',meta:'+ roles.customer'},{who:'AI',area:'Permissions',text:'Customers see only their company’s work orders',meta:'+ visibility.work_orders.customer'}]},
+ {v:'v1.2',env:'Archived',date:'Sep 1',by:'Jordan Lee',items:[{who:'AI',area:'Workflow',text:'Added work order states New → Scheduled → In progress → Done',meta:'+ workflows.work_order'}]}];
+
+class Component extends DCLogic {
+  state = Object.assign(seed(),{
+    screen:this.props.startScreen==='Projects home'?'home':'editor',layout:null,
+    pageId:'orders',sel:'o3',rightTab:'ai',leftTab:'pages',railAdd:false,device:'desktop',role:'Admin',lang:'English',
+    messages:[{role:'user',text:'An app for our field technicians to manage work orders, log hours and parts. Dispatchers assign jobs; customers can see their own jobs.'},{role:'ai',text:'I set up FieldOps from your description: 4 pages, 4 tables, 4 roles and a work order workflow (New → Scheduled → In progress → Waiting on parts → Done). Customers already see only their company’s work orders. What should we change?'}],
+    aiInput:'',thinking:false,aiSeen:2,changes:SEED_CHANGES.slice(),
+    dataTable:'orders',dataTab:'records',adding:false,newName:'',newType:'Text',
+    relSel:'draft',relMeta:false,versions:VERSIONS,relVersion:'v1.5',relTarget:'Staging',
+    metaNode:'page:orders',modal:null,homePrompt:'',
+    projects:[{id:'fieldops',name:'FieldOps Service Desk',desc:'Work orders, technicians and parts for field teams',status:'Live · v1.4',edited:'Edited 2 min ago',tint:'#e3f5ef',accent:'#0e7c66',records:'8 work orders, 5 customers, 4 technicians and 4 parts in Development'},{id:'po',name:'Purchase Approvals',desc:'Requests, budgets and two-step approvals',status:'Draft',edited:'Edited yesterday',tint:'#eef0ff',accent:'#4f5bea',records:'46 requests and 12 budgets'},{id:'onb',name:'Client Onboarding Portal',desc:'Checklists, documents and client sign-off',status:'Live · v2.1',edited:'Edited Sep 28',tint:'#fff3df',accent:'#9a5b00',records:'31 clients and 214 tasks'}],
+    copyFrom:'',copyName:'',copyRecords:false,copyUsers:false,copySrc:null,toast:null
+  });
+  msgRef = React.createRef();
+
+  componentDidUpdate(pp,ps){ if((ps.messages!==this.state.messages||ps.thinking!==this.state.thinking)&&this.msgRef.current){const el=this.msgRef.current;el.scrollTop=el.scrollHeight;} }
+  componentWillUnmount(){clearTimeout(this._t);clearTimeout(this._toast);}
+  toast(t){clearTimeout(this._toast);this.setState({toast:t});this._toast=setTimeout(()=>this.setState({toast:null}),2600);}
+  go(screen,extra){this.setState(Object.assign({screen,railAdd:false},extra||{}));}
+  select(id){this.setState(s=>({sel:id,rightTab:(this.layoutName()==='Side-by-side')?s.rightTab:'props',railAdd:false}));}
+  layoutName(){return this.state.layout||this.props.editorLayout||'Classic';}
+  findBlock(id,s){s=s||this.state;for(const p of s.pages){const b=p.blocks.find(b=>b.id===id);if(b)return{p,b};}return{};}
+  upsert(s,e){const list=s.changes.slice();const i=e.key?list.findIndex((c,ix)=>c.key===e.key&&ix>=s.aiSeen):-1;const entry=Object.assign({who:'You',time:'Just now'},e);if(i>=0)list[i]=entry;else list.push(entry);return list;}
+  patchBlock(id,fn,log){this.setState(s=>{const pages=s.pages.map(p=>({...p,blocks:p.blocks.map(b=>b.id===id?fn({...b}):b)}));return {pages,changes:log?this.upsert(s,log(this.findBlock(id,s))):s.changes};});}
+  setField(id,field,label){return e=>{const v=e.target.value;this.patchBlock(id,b=>{b[field]=v;return b;},({p,b})=>({key:id+'.'+field,area:'Pages',text:`Changed ${label} of “${b.title||TYPE[b.type].l}” block to “${v}”`,meta:`~ pages.${p.id}.blocks.${id}.${field} = ${JSON.stringify(v)}`}));};}
+  toggleIn(id,field,val,label,area){this.patchBlock(id,b=>{const a=(b[field]||ROLES).slice();const i=a.indexOf(val);if(i>=0)a.splice(i,1);else a.push(val);b[field]=a;return b;},({p,b})=>{const has=!(b[field]||ROLES).includes(val);return {key:id+'.'+field+'.'+val,area:area||'Pages',text:`${has?'Added':'Removed'} ${label} ${has?'to':'from'} “${b.title||TYPE[b.type].l}”`,meta:`${has?'+':'-'} pages.${p.id}.blocks.${id}.${field} ${has?'+=':'-='} "${snake(val)}"`};});}
+  addBlock(type){
+    const id='b'+Date.now().toString(36);
+    const D={header:{title:'New section',subtitle:'Describe this section for your team.',button:'',buttonRoles:ROLES.slice()},stats:{items:['open','done']},table:{title:'Work orders',source:'orders',columns:['ref','job','status'],filter:'none'},form:{title:'Request a visit',source:'orders',columns:['job','customer','due'],submit:'Send request'},text:{text:'Add instructions or context for your team here.'}};
+    this.setState(s=>{const pages=s.pages.map(p=>{if(p.id!==s.pageId)return p;const blocks=p.blocks.slice();const i=blocks.findIndex(b=>b.id===s.sel);blocks.splice(i<0?blocks.length:i+1,0,Object.assign({id,type},JSON.parse(JSON.stringify(D[type]))));return {...p,blocks};});
+      const pg=s.pages.find(p=>p.id===s.pageId);return {pages,sel:id,rightTab:this.layoutName()==='Side-by-side'?s.rightTab:'props',leftTab:'pages',railAdd:false,changes:this.upsert(s,{area:'Pages',text:`Added a ${TYPE[type].l.toLowerCase()} block to ${pg.name}`,meta:`+ pages.${pg.id}.blocks.${id} = { component: "${TYPE[type].c}" }`})};});
+  }
+  moveBlock(id,d){this.setState(s=>({pages:s.pages.map(p=>{const i=p.blocks.findIndex(b=>b.id===id);if(i<0)return p;const j=i+d;if(j<0||j>=p.blocks.length)return p;const a=p.blocks.slice();[a[i],a[j]]=[a[j],a[i]];return {...p,blocks:a};}),changes:this.upsert(s,{key:id+'.order',area:'Pages',text:`Reordered blocks on ${this.findBlock(id,s).p.name}`,meta:`~ pages.${this.findBlock(id,s).p.id}.blocks (order)`})}));}
+  dupBlock(id){const nid='b'+Date.now().toString(36);this.setState(s=>{const {p,b}=this.findBlock(id,s);return {pages:s.pages.map(x=>{if(x!==p)return x;const a=x.blocks.slice();a.splice(a.indexOf(b)+1,0,Object.assign(JSON.parse(JSON.stringify(b)),{id:nid}));return {...x,blocks:a};}),sel:nid,changes:this.upsert(s,{area:'Pages',text:`Duplicated “${b.title||TYPE[b.type].l}” on ${p.name}`,meta:`+ pages.${p.id}.blocks.${nid}`})};});}
+  delBlock(id){this.setState(s=>{const {p,b}=this.findBlock(id,s);return {pages:s.pages.map(x=>x===p?{...x,blocks:x.blocks.filter(y=>y.id!==id)}:x),sel:null,changes:this.upsert(s,{area:'Pages',text:`Removed “${b.title||TYPE[b.type].l}” from ${p.name}`,meta:`- pages.${p.id}.blocks.${id}`})};});}
+  addPage(){const id='page'+(this.state.pages.length+1);this.setState(s=>({pages:[...s.pages,{id,name:'New page',icon:'file',blocks:[{id:id+'h',type:'header',title:'New page',subtitle:'',button:'',buttonRoles:ROLES.slice()}]}],pageId:id,sel:id+'h',changes:this.upsert(s,{area:'Pages',text:'Added a new page to navigation',meta:`+ pages.${id}`})}));}
+  recs(key,role){const s=this.state;let r=s.records[key]||[];if(key==='orders'){if(role==='Customer')r=r.filter(x=>x.customer==='Northwind Clinics');if(role==='Technician'&&s.visRule)r=r.filter(x=>x.tech==='Sam Ortiz');}return r;}
+  cell(f,v,tr){const val=v==null||v===''?'—':v;const t=tr(val);const p=(f.key==='status'||f.key==='priority')&&PILL[t];return {text:t,pill:!!p,plain:!p,bg:p?p[0]:'',fg:p?p[1]:(val==='—'?'#a5a7b5':(f.key==='ref'?'#6b6d80':'#17182a'))};}
+  blockVals(b,ctx){
+    const s=this.state,tr=ctx.tr,sel=ctx.editing&&s.sel===b.id,T=TYPE[b.type];
+    const st=fn=>e=>{e.stopPropagation();fn();};
+    const o={id:b.id,isHeader:b.type==='header',isStats:b.type==='stats',isTable:b.type==='table',isForm:b.type==='form',isText:b.type==='text',isSel:sel,
+      outline:sel?'2px solid #4f5bea':(ctx.editing?'1px dashed transparent':'none'),cursor:ctx.editing?'pointer':'default',
+      onSelect:ctx.editing?(e=>{e.stopPropagation();this.select(b.id);}):undefined,
+      tag:T.l+(b.title?' · '+b.title:''),tagIcon:'icon-'+T.i,
+      restricted:ctx.editing&&b.visibleTo&&b.visibleTo.length<ROLES.length?b.visibleTo.join(', '):'',
+      onUp:st(()=>this.moveBlock(b.id,-1)),onDown:st(()=>this.moveBlock(b.id,1)),onDup:st(()=>this.dupBlock(b.id)),onDel:st(()=>this.delBlock(b.id))};
+    o.hasRestricted=!!o.restricted;
+    if(b.type==='header'){o.title=tr(b.title);o.subtitle=tr(b.subtitle);o.hasSubtitle=!!b.subtitle;o.hasButton=!!b.button&&(ctx.editing||(b.buttonRoles||ROLES).includes(ctx.role));o.buttonLabel=tr(b.button);}
+    if(b.type==='stats'){const rs=this.recs('orders',ctx.role),u=USERS[ctx.role];o.items=b.items.filter(k=>STATS[k]&&(!STATS[k].needs||s.hasPriority)).map(k=>({label:tr(STATS[k].l),value:rs.filter(r=>STATS[k].f(r,u)).length,color:STATS[k].accent?'#b42318':'#17182a'}));}
+    if(b.type==='table'||b.type==='form'){
+      const t=s.tables[b.source];const cols=b.columns.map(k=>t.fields.find(f=>f.key===k)).filter(Boolean);
+      o.title=tr(b.title);
+      if(b.type==='table'){let rs=this.recs(b.source,ctx.role);if(b.filter==='open')rs=rs.filter(r=>r.status!=='Done');if(b.filter==='mine')rs=rs.filter(r=>r.tech===USERS[ctx.role]);
+        o.cols=cols.map(f=>({label:tr(f.name)}));o.grid=cols.map(f=>f.key==='job'||f.key==='name'?'minmax(180px,2fr)':f.key==='ref'?'minmax(90px,.7fr)':'minmax(110px,1fr)').join(' ');o.minW=(cols.length*120)+'px';
+        o.rows=rs.map(r=>({cells:cols.map(f=>this.cell(f,r[f.key],tr))}));o.count=rs.length+(rs.length===1?' record':' records');o.empty=rs.length===0;}
+      else{o.fields=cols.map(f=>({label:tr(f.name),req:f.req?' *':'',ph:f.type.startsWith('Link')?'Choose '+f.name.toLowerCase()+'…':f.type==='Date'?'Pick a date':'Enter '+f.name.toLowerCase()}));o.submit=b.submit;}
+    }
+    if(b.type==='text')o.text=b.text;
+    return o;
+  }
+  send(text){
+    const st=this.state;const t=(typeof text==='string'?text:st.aiInput).trim();if(!t||st.thinking)return;
+    const unseen=st.changes.slice(st.aiSeen).filter(c=>c.who==='You');
+    this.setState({messages:[...st.messages,{role:'user',text:t}],aiInput:'',thinking:true,rightTab:'ai'});
+    clearTimeout(this._t);this._t=setTimeout(()=>{
+      const key=/technician|assign|own job|their own|only see/i.test(t)?'vis':/spanish|transl|language|españ/i.test(t)?'tr':'pri';
+      const P=PLANS[key];const note=unseen.length?`I can see ${unseen.length===1?'your recent edit':unseen.length+' edits you made'} in the editor — ${unseen.slice(-2).map(c=>c.text).join('; ')}. My plan builds on ${unseen.length===1?'it':'them'}.`:'';
+      this.setState(s2=>({thinking:false,aiSeen:s2.changes.length,messages:[...s2.messages,{role:'ai',text:P.intro,note,plan:{key,status:'pending',items:P.items.map(i=>({...i,checked:true,open:false}))}}]}));
+    },1300);
+  }
+  togglePlan(mi,ii,k){this.setState(s=>({messages:s.messages.map((m,j)=>j!==mi?m:{...m,plan:{...m.plan,items:m.plan.items.map((it,x)=>x===ii?{...it,[k]:!it[k]}:it)}})}));}
+  applyPlan(mi){
+    const st=this.state;const m=st.messages[mi];const items=m.plan.items.filter(i=>i.checked);if(!items.length)return;
+    const d=JSON.parse(JSON.stringify({tables:st.tables,records:st.records,pages:st.pages,rules:st.rules,visRule:st.visRule,langs:st.langs,translated:st.translated,langSwitch:st.langSwitch,hasPriority:st.hasPriority}));
+    items.forEach(i=>EFFECTS[i.id](d));
+    const changes=[...st.changes,...items.map(i=>({who:'AI',area:i.area,text:i.title,meta:'+ '+i.meta.split('\n')[0],time:'Just now'}))];
+    const messages=st.messages.map((x,j)=>j===mi?{...x,plan:{...x.plan,status:'applied'}}:x);
+    messages.push({role:'ai',text:`Applied ${items.length} of ${m.plan.items.length} changes. ${AFTER[m.plan.key]}`,links:true});
+    this.setState(Object.assign(d,{changes,messages,aiSeen:changes.length}));this.toast('Changes applied — the editor and preview are updated');
+  }
+  metaObj(k){
+    const s=this.state;const roles=ROLES.map(snake);
+    const blockMeta=b=>{const m={id:b.id,component:TYPE[b.type].c};
+      if(b.type==='header')m.props={title:b.title,subtitle:b.subtitle||null,primary_action:b.button?{label:b.button,action:'open_form',visible_to:(b.buttonRoles||ROLES).map(snake)}:null};
+      if(b.type==='stats')m.items=b.items.map(i=>({label:STATS[i].l,query:`count(work_orders where ${STATS[i].q})`}));
+      if(b.type==='table')m.props={title:b.title},m.query={table:s.tables[b.source].id,columns:b.columns,filter:b.filter==='open'?'status != done':b.filter==='mine'?'technician = current_user()':null};
+      if(b.type==='form')m.props={title:b.title,submit_label:b.submit},m.query={table:s.tables[b.source].id,fields:b.columns};
+      if(b.type==='text')m.props={content:b.text};
+      if(b.visibleTo)m.visible_to=b.visibleTo.map(snake);return m;};
+    if(k==='app')return {id:'fieldops_service_desk',label:'FieldOps Service Desk',default_language:'en',languages:s.langs.map(l=>l==='English'?'en':'es'),navigation:s.pages.map(p=>p.id),roles,header:{language_switcher:s.langSwitch}};
+    if(k.startsWith('page:')){const p=s.pages.find(p=>p.id===k.slice(5));if(!p)return {};return {id:p.id,label:p.name,path:'/'+p.id.replace(/_/g,'-'),visible_to:(p.visibleTo||ROLES).map(snake),blocks:p.blocks.map(blockMeta)};}
+    if(k.startsWith('table:')){const key=k.slice(6),t=s.tables[key];const f={};t.fields.forEach(x=>{f[x.key]=Object.assign({label:x.name,type:typeId(x.type)},x.req?{required:true}:{},x.link?{references:s.tables[x.link].id}:{},x.key==='priority'?{options:['low','normal','urgent'],default:'normal'}:{},x.key==='status'?{workflow:'work_order'}:{});});return {id:t.id,label:t.name,fields:f,_records:`not part of the definition (${(s.records[key]||[]).length} in development)`};}
+    if(k==='roles')return {roles:Object.fromEntries(ROLES.map(r=>[snake(r),{label:r}])),record_visibility:s.rules.filter(r=>r.kind==='Record visibility').map(r=>({table:'work_orders',role:snake(r.roles[0]),where:r.roles[0]==='Customer'?'customer = current_user().company':'technician = current_user()'})),field_permissions:s.rules.filter(r=>r.kind==='Permission').map(r=>({table:'work_orders',field:'priority',edit:['admin','dispatcher']}))};
+    if(k==='rules')return {validations:s.rules.filter(r=>r.kind==='Validation').map(r=>({id:snake(r.text).slice(0,32),table:'work_orders',message:r.text}))};
+    if(k==='workflow')return {id:'work_order',table:'work_orders',field:'status',states:['new','scheduled','in_progress','waiting_on_parts','done'],transitions:[{from:'new',to:'scheduled',allowed:['admin','dispatcher']},{from:'scheduled',to:'in_progress',allowed:['technician']},{from:'in_progress',to:'waiting_on_parts',allowed:['technician']},{from:'waiting_on_parts',to:'in_progress',allowed:['technician','dispatcher']},{from:'in_progress',to:'done',allowed:['technician'],requires:['hours']}]};
+    if(k==='i18n')return {languages:s.langs.map(l=>l==='English'?'en':'es'),es:s.translated?Object.fromEntries(Object.entries(ES).slice(0,10)):{}};
+    return {};
+  }
+  renderVals(){
+    const s=this.state;const layout=this.layoutName();
+    const isEditor=s.screen==='editor',isPreview=s.screen==='preview';
+    const role=isEditor?'Admin':s.role,lang=isEditor?'English':s.lang;
+    const tr=x=>(lang==='Español'&&s.translated&&ES[x])||x;
+    const ctx={editing:isEditor,role,tr};
+    const act=on=>on?{bg:'#eef0ff',fg:'#3f4bd8'}:{bg:'transparent',fg:'#4a4c5e'};
+    const seg=on=>on?{bg:'#fff',fg:'#17182a',shadow:'0 1px 2px rgba(20,20,40,.1)'}:{bg:'transparent',fg:'#6b6d80',shadow:'none'};
+    const chip=on=>on?{bg:'#eef0ff',fg:'#3f4bd8',border:'#c7ccff'}:{bg:'#fff',fg:'#6b6d80',border:'#e1e1ea'};
+    const visPages=isEditor?s.pages:s.pages.filter(p=>!p.visibleTo||p.visibleTo.includes(role));
+    const page=visPages.find(p=>p.id===s.pageId)||visPages[0]||s.pages[0];
+    const blocks=page.blocks.filter(b=>isEditor||!b.visibleTo||b.visibleTo.includes(role)).map(b=>this.blockVals(b,ctx));
+    const pendingPlans=s.messages.filter(m=>m.plan&&m.plan.status==='pending').length;
+    const unseen=s.changes.slice(s.aiSeen).filter(c=>c.who==='You');
+    const tabsMode=layout!=='Side-by-side';
+    const v={
+      isHome:s.screen==='home',inStudio:s.screen!=='home',isEditor,isPreview,isData:s.screen==='data',isReleases:s.screen==='releases',isMeta:s.screen==='metadata',
+      showCanvasRow:isEditor||isPreview,showLeftFull:isEditor&&layout!=='Focus canvas',showLeftRail:isEditor&&layout==='Focus canvas',showRight:isEditor,
+      rightTabsMode:tabsMode,rightStacked:!tabsMode,showProps:isEditor&&(!tabsMode||s.rightTab==='props'),showAi:isEditor&&(!tabsMode||s.rightTab==='ai'),
+      propsW:tabsMode?'360px':'300px',aiW:tabsMode?'360px':'360px',propsBorder:tabsMode?'none':'1px solid #e8e8ef',
+      goHome:()=>this.go('home'),goEditor:()=>this.go('editor'),goPreview:()=>this.go('preview'),goReleases:()=>this.go('releases',{relSel:'draft'}),goMeta:()=>this.go('metadata',{metaNode:'page:'+page.id}),
+      metaBtnBg:s.screen==='metadata'?'#17182a':'#fff',metaBtnFg:s.screen==='metadata'?'#fff':'#4a4c5e',metaBtnBorder:s.screen==='metadata'?'#17182a':'#e1e1ea',
+      navTabs:[['editor','Build','pencil-ruler'],['data','Data','database'],['preview','Preview','play'],['releases','Releases','rocket']].map(([k,l,i])=>Object.assign({label:l,icon:'icon-'+i,go:()=>this.go(k),hasBadge:k==='releases'&&s.changes.length>0,badge:s.changes.length},seg(s.screen===k))),
+      leftTabs:[['pages','Pages'],['add','Add block']].map(([k,l])=>Object.assign({label:l,go:()=>this.setState({leftTab:k})},act(s.leftTab===k))),
+      leftPages:s.leftTab==='pages',leftAdd:s.leftTab==='add',
+      pageList:s.pages.map(p=>Object.assign({name:p.name,icon:'icon-'+p.icon,sub:p.blocks.length+' blocks'+(p.visibleTo&&p.visibleTo.length<4?' · '+p.visibleTo.length+' roles':''),restricted:!!p.visibleTo&&p.visibleTo.length<4,go:()=>this.setState({pageId:p.id,sel:null})},act(p.id===page.id))),
+      layerList:page.blocks.map(b=>Object.assign({label:b.title||TYPE[b.type].l,type:TYPE[b.type].l,icon:'icon-'+TYPE[b.type].i,go:()=>this.select(b.id)},act(s.sel===b.id))),
+      palette:PALETTE.map(([t,d])=>({label:TYPE[t].l,desc:d,icon:'icon-'+TYPE[t].i,add:()=>this.addBlock(t)})),
+      addPage:()=>this.addPage(),railAdd:s.railAdd,toggleRailAdd:()=>this.setState({railAdd:!s.railAdd}),
+      openAdd:e=>{e.stopPropagation();if(layout==='Focus canvas')this.setState({railAdd:true});else this.setState({leftTab:'add'});},
+      pageName:page.name,pagePath:'/'+page.id.replace(/_/g,'-'),
+      layouts:[['Classic','Classic: panels + tabs','layout-panel-left'],['Side-by-side','Side-by-side: properties and AI together','columns-3'],['Focus canvas','Focus canvas: compact rail','maximize']].map(([k,l,i])=>Object.assign({label:l,icon:'icon-'+i,go:()=>this.setState({layout:k,railAdd:false})},act(layout===k))),
+      devices:[['desktop','Desktop','monitor'],['tablet','Tablet','tablet'],['mobile','Phone','smartphone']].map(([k,l,i])=>Object.assign({label:l,icon:'icon-'+i,go:()=>this.setState({device:k})},seg(s.device===k))),
+      frameW:{desktop:'1100px',tablet:'780px',mobile:'400px'}[s.device],
+      clearSel:()=>{if(isEditor&&s.sel)this.setState({sel:null,railAdd:false});},
+      navPages:visPages.map(p=>Object.assign({label:tr(p.name),go:()=>this.setState({pageId:p.id,sel:null})},p.id===page.id?{bg:'#e3f5ef',fg:'#0e7c66'}:{bg:'transparent',fg:'#4a4c5e'})),
+      blocks,userInitials:INIT[role],showLangSwitch:isPreview&&s.langSwitch,langCode:lang==='Español'?'ES':'EN',
+      roleTabs:ROLES.map(r=>Object.assign({label:r,user:USERS[r],go:()=>this.setState({role:r})},seg(s.role===r))),
+      hasLangs:s.langs.length>1,langTabs:s.langs.map(l=>Object.assign({label:l,go:()=>this.setState({lang:l})},seg(s.lang===l))),
+      rightTabs:[['props','Properties','sliders-horizontal'],['ai','Studio AI','sparkles']].map(([k,l,i])=>Object.assign({label:l,icon:'icon-'+i,go:()=>this.setState({rightTab:k}),hasBadge:k==='ai'&&pendingPlans>0&&s.rightTab!=='ai',badge:pendingPlans},act(s.rightTab===k))),
+      dots:React.createElement('div',{style:{display:'flex',gap:3}},[0,1,2].map(i=>React.createElement('span',{key:i,style:{width:5,height:5,borderRadius:3,background:'#8b93f5',animation:`dcdot 1s ${i*0.15}s infinite ease-in-out`}}))),
+      thinking:s.thinking,msgRef:this.msgRef,aiInput:s.aiInput,
+      onAiInput:e=>this.setState({aiInput:e.target.value}),onAiKey:e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.send();}},send:()=>this.send(),
+      showSuggestions:!s.thinking&&!s.messages.some(m=>m.plan),
+      suggestions:['Add a priority to work orders','Technicians should only see their own jobs','Add Spanish for our field team'].map(l=>({label:l,go:()=>this.send(l)})),
+      hasUnseen:unseen.length>0,unseen:unseen.slice(-3).map(c=>({text:c.text})),unseenTitle:`Studio AI will see ${unseen.length} edit${unseen.length>1?'s':''} you made`,
+      toast:s.toast,hasToast:!!s.toast,stop:e=>e.stopPropagation(),closeModal:()=>this.setState({modal:null})
+    };
+    v.messages=s.messages.map((m,mi)=>{const isAi=m.role==='ai';const o={isUser:!isAi,isAi,text:m.text,hasNote:!!m.note,note:m.note,hasPlan:!!m.plan,hasLinks:!!m.links};
+      if(m.plan){const p=m.plan,n=p.items.filter(i=>i.checked).length;o.pending=p.status==='pending';o.planTitle=`Change plan · ${p.items.length} changes`;
+        o.statusLabel=p.status==='pending'?'Waiting for approval':p.status==='applied'?'Applied':'Discarded';o.statusFg=p.status==='applied'?'#1c7a45':p.status==='pending'?'#9a5b00':'#8a8c9c';
+        o.applyLabel=n?`Apply ${n} change${n>1?'s':''}`:'Select at least one';o.onApply=()=>this.applyPlan(mi);o.onDismiss=()=>this.setState(st=>({messages:st.messages.map((x,j)=>j===mi?{...x,plan:{...x.plan,status:'dismissed'}}:x)}));
+        o.items=p.items.map((it,ii)=>{const a=AREA[it.area];const applied=p.status==='applied'&&it.checked;return {title:it.title,detail:it.detail,area:it.area,meta:it.meta,open:it.open,areaBg:a[0],areaFg:a[1],iconCls:'icon-'+a[2],isPending:o.pending,isApplied:applied,isSkipped:!o.pending&&!applied,opacity:!o.pending&&!applied?'.55':'1',boxBg:it.checked?'#4f5bea':'#fff',boxBorder:it.checked?'#4f5bea':'#c9cad6',toggle:()=>this.togglePlan(mi,ii,'checked'),toggleMeta:()=>this.togglePlan(mi,ii,'open'),metaLabel:it.open?'Hide definition':'Show definition'};});}
+      return o;});
+    // selection
+    const fb=isEditor&&s.sel?this.findBlock(s.sel):{};const b=fb.b;
+    if(!b)v.sel={none:true,has:false};else{const T=TYPE[b.type];const t=s.tables[b.source];
+      v.sel={none:false,has:true,typeLabel:T.l,icon:'icon-'+T.i,pageName:fb.p.name,isHeader:b.type==='header',isTable:b.type==='table',isStats:b.type==='stats',isForm:b.type==='form',isText:b.type==='text',
+        hasTitle:b.type!=='stats'&&b.type!=='text',titleLabel:b.type==='header'?'Title':'Block title',title:b.title||'',subtitle:b.subtitle||'',button:b.button||'',text:b.text||'',submit:b.submit||'',
+        onTitle:this.setField(b.id,'title','title'),onSubtitle:this.setField(b.id,'subtitle','subtitle'),onButton:this.setField(b.id,'button','button label'),onText:this.setField(b.id,'text','text'),onSubmit:this.setField(b.id,'submit','submit label'),
+        buttonRoleChips:ROLES.map(r=>Object.assign({label:r,toggle:()=>this.toggleIn(b.id,'buttonRoles',r,r+' access to the main button','Permissions')},chip((b.buttonRoles||ROLES).includes(r)))),
+        hasSource:!!t,source:b.source,colsLabel:b.type==='form'?'Fields in the form':'Columns',
+        sourceOptions:Object.keys(s.tables).map(k=>({value:k,label:s.tables[k].name})),
+        onSource:e=>{const k=e.target.value;this.patchBlock(b.id,x=>{x.source=k;x.columns=s.tables[k].fields.slice(0,4).map(f=>f.key);return x;},({p})=>({key:b.id+'.source',area:'Pages',text:`Changed “${b.title}” to show ${s.tables[k].name}`,meta:`~ pages.${p.id}.blocks.${b.id}.query.table = "${s.tables[k].id}"`}));},
+        colOptions:t?t.fields.map(f=>Object.assign({label:f.name==='#'?'Number':f.name,toggle:()=>this.patchBlock(b.id,x=>{const on=x.columns.includes(f.key);x.columns=on?x.columns.filter(c=>c!==f.key):t.fields.map(z=>z.key).filter(z=>z===f.key||x.columns.includes(z));return x;},({p,b:x})=>{const on=x.columns.includes(f.key);return {key:b.id+'.col.'+f.key,area:'Pages',text:`${on?'Removed':'Added'} “${f.name}” ${b.type==='form'?'field':'column'} ${on?'from':'to'} ${x.title}`,meta:`${on?'-':'+'} pages.${p.id}.blocks.${b.id}.columns ${on?'-=':'+='} "${f.key}"`};})},chip(b.columns.includes(f.key)))):[],
+        filterOptions:[['none','All records'],['open','Only open jobs (not Done)'],['mine','Only those assigned to the viewer']].map(([k,l])=>({label:l,ring:b.filter===k?'5px solid #4f5bea':'1.5px solid #c9cad6',go:()=>this.patchBlock(b.id,x=>{x.filter=k;return x;},({p})=>({key:b.id+'.filter',area:'Pages',text:`Set “${b.title}” to show: ${l.toLowerCase()}`,meta:`~ pages.${p.id}.blocks.${b.id}.query.filter = "${k}"`}))})),
+        statOptions:Object.keys(STATS).filter(k=>!STATS[k].needs||s.hasPriority).map(k=>Object.assign({label:STATS[k].l,toggle:()=>this.toggleIn(b.id,'items',k,'“'+STATS[k].l+'” number')},chip((b.items||[]).includes(k)))),
+        roleChips:ROLES.map(r=>Object.assign({label:r,toggle:()=>this.toggleIn(b.id,'visibleTo',r,r+' visibility','Permissions')},chip(!b.visibleTo||b.visibleTo.includes(r)))),
+        askAi:()=>this.setState({rightTab:'ai',aiInput:`For the “${b.title||T.l}” block on ${fb.p.name}: `}),
+        viewDef:()=>this.go('metadata',{metaNode:'page:'+fb.p.id})};}
+    // preview summary
+    const allO=s.records.orders.length,seen=this.recs('orders',s.role).length;
+    v.previewWho=`${USERS[s.role]} · ${s.role}`;
+    v.previewSummary=s.role==='Technician'?(s.visRule?`sees ${seen} of ${allO} work orders.`:`sees all ${allO} work orders. Ask Studio AI to limit this.`):s.role==='Customer'?`sees ${seen} of ${allO} work orders and ${visPages.length} page.`:`sees all ${allO} work orders and ${visPages.length} pages.`;
+    v.activeRules=s.rules.filter(r=>r.roles.includes(s.role)).map(r=>`${r.kind}: ${r.text}`);
+    // data
+    const dt=s.tables[s.dataTable],dr=s.records[s.dataTable]||[];
+    Object.assign(v,{tableList:Object.keys(s.tables).map(k=>Object.assign({label:s.tables[k].name,icon:'icon-'+s.tables[k].icon,count:(s.records[k]||[]).length,go:()=>this.setState({dataTable:k,adding:false})},act(k===s.dataTable))),
+      dtName:dt.name,dtId:'tables.'+dt.id,dtIcon:'icon-'+dt.icon,dtFieldCount:dt.fields.length+' fields',dtRecordCount:dr.length,
+      dataTabs:[['records','Records'],['fields','Fields'],['rels','Relationships']].map(([k,l])=>({label:l,go:()=>this.setState({dataTab:k}),fg:s.dataTab===k?'#17182a':'#8a8c9c',line:s.dataTab===k?'#4f5bea':'transparent'})),
+      dataRecords:s.dataTab==='records',dataFields:s.dataTab==='fields',dataRels:s.dataTab==='rels',
+      dataCols:dt.fields.map(f=>({label:f.name,icon:'icon-'+(f.type.startsWith('Link')?'link':FTICON[f.type]||'type')})),dataGrid:dt.fields.map(f=>f.key==='job'?'minmax(220px,2fr)':'minmax(130px,1fr)').join(' '),dataMinW:(dt.fields.length*140)+'px',
+      dataRows:dr.map(r=>({cells:dt.fields.map(f=>this.cell(f,r[f.key],x=>x))})),
+      fieldRows:dt.fields.map(f=>({name:f.name,key:f.key,type:f.type,icon:'icon-'+(f.type.startsWith('Link')?'link':FTICON[f.type]||'type'),req:f.req?'Required':'Optional',used:s.pages.filter(p=>p.blocks.some(b=>b.source===s.dataTable&&(b.columns||[]).includes(f.key))).map(p=>p.name).join(', ')||'—'})),
+      rels:[...dt.fields.filter(f=>f.link).map(f=>({a:dt.name,b:s.tables[f.link].name,kind:'Many to one',text:`Each record links to one ${s.tables[f.link].name.toLowerCase().replace(/s$/,'')} through “${f.name}”.`})),...Object.keys(s.tables).filter(k=>k!==s.dataTable).flatMap(k=>s.tables[k].fields.filter(f=>f.link===s.dataTable).map(f=>({a:dt.name,b:s.tables[k].name,kind:'One to many',text:`One record can have many ${s.tables[k].name.toLowerCase()} (via their “${f.name}” field).`})))],
+      adding:s.adding,newName:s.newName,newType:s.newType,fieldTypes:FIELD_TYPES,
+      startAddField:()=>this.setState({adding:true,dataTab:'fields'}),cancelAdd:()=>this.setState({adding:false,newName:''}),
+      onNewName:e=>this.setState({newName:e.target.value}),onNewType:e=>this.setState({newType:e.target.value}),
+      addField:()=>{const n=s.newName.trim();if(!n)return;const key=snake(n);this.setState(st=>{const tables=JSON.parse(JSON.stringify(st.tables));const f={key,name:n,type:st.newType};if(st.newType.startsWith('Link'))f.link=st.newType.includes('Customers')?'customers':'technicians';tables[st.dataTable].fields.push(f);return {tables,adding:false,newName:'',changes:this.upsert(st,{area:'Database',text:`Added “${n}” field (${st.newType}) to ${st.tables[st.dataTable].name}`,meta:`+ tables.${st.tables[st.dataTable].id}.fields.${key} = { type: "${typeId(st.newType)}" }`})};});this.toast(`Field added to ${dt.name} — existing records keep their data`);}});
+    // releases
+    const prod=s.versions.find(x=>x.env==='Production'),stg=s.versions.find(x=>x.env==='Staging');
+    const envC={Production:['#e5f6ec','#1c7a45'],Staging:['#fff3df','#9a5b00'],Archived:['#f2f2f6','#8a8c9c'],Draft:['#eef0ff','#3f4bd8']};
+    const isDraft=s.relSel==='draft';const rv=isDraft?null:s.versions.find(x=>x.v===s.relSel);const items=isDraft?s.changes:(rv?rv.items:[]);
+    const groups={};items.forEach(c=>{(groups[c.area]=groups[c.area]||[]).push(c);});
+    Object.assign(v,{relList:[Object.assign({label:'Unreleased changes',env:'Draft',sub:`${s.changes.length} change${s.changes.length===1?'':'s'} in Development`,go:()=>this.setState({relSel:'draft'}),envBg:envC.Draft[0],envFg:envC.Draft[1]},isDraft?{bg:'#eef0ff',fg:'#17182a'}:{bg:'transparent',fg:'#17182a'}),...s.versions.map(x=>({label:x.v,env:x.env,sub:`${x.date} · ${x.by}`,go:()=>this.setState({relSel:x.v}),envBg:envC[x.env][0],envFg:envC[x.env][1],bg:s.relSel===x.v?'#eef0ff':'transparent',fg:'#17182a'}))],
+      pipeline:[{label:'Development',value:`${s.changes.length} unreleased`,sub:'Your working copy',icon:'icon-pencil-ruler',bg:'#eef0ff',fg:'#3f4bd8'},{label:'Staging',value:stg?stg.v:'—',sub:stg?'Released '+stg.date:'Nothing in testing',icon:'icon-flask-conical',bg:'#fff3df',fg:'#9a5b00'},{label:'Production',value:prod?prod.v:'—',sub:'1,284 work orders · own records',icon:'icon-globe',bg:'#e5f6ec',fg:'#1c7a45'}],
+      relTitle:isDraft?'Unreleased changes':rv.v,relSub:isDraft?'Everything changed since the last release, by you or Studio AI.':`${rv.env} · released ${rv.date} by ${rv.by}`,relIsDraft:isDraft,relEmpty:items.length===0,
+      relViews:[['f','Plain language'],['m','Definition changes']].map(([k,l])=>Object.assign({label:l,go:()=>this.setState({relMeta:k==='m'})},seg((k==='m')===s.relMeta))),relFriendly:!s.relMeta,relMetaView:s.relMeta,
+      relGroups:Object.keys(groups).map(a=>({area:a,bg:AREA[a][0],fg:AREA[a][1],count:groups[a].length+' change'+(groups[a].length>1?'s':''),items:groups[a].map(c=>({who:c.who==='AI'?'AI':'You'.slice(0,1)+'',whoBg:c.who==='AI'?'#eef0ff':'#f2f2f6',whoFg:c.who==='AI'?'#3f4bd8':'#4a4c5e',text:c.text,meta:c.meta||'',metaFg:(c.meta||'').startsWith('-')?'#b42318':(c.meta||'').startsWith('~')?'#9a5b00':'#1c7a45',time:c.time||rv&&rv.date||''}))})),
+      openRelease:()=>this.setState({modal:'release'}),modalRelease:s.modal==='release',relVersion:s.relVersion,onRelVersion:e=>this.setState({relVersion:e.target.value}),
+      relTargets:['Staging','Production'].map(t=>Object.assign({label:t,go:()=>this.setState({relTarget:t})},seg(s.relTarget===t))),
+      relCountText:`${s.changes.length} structure change${s.changes.length===1?'':'s'} from Development.`,relCta:`Release ${s.relVersion} to ${s.relTarget}`,
+      relSteps:[{icon:'icon-layers',color:'#4f5bea',text:`Pages, fields, rules and permissions from Development are applied to ${s.relTarget}.`},...s.changes.filter(c=>c.area==='Database').map(c=>({icon:'icon-database',color:'#0e7c66',text:`${c.text}. Existing ${s.relTarget} records are kept; the new field starts empty or at its default.`})),{icon:'icon-shield-check',color:'#6b3fc9',text:`Records are not copied. ${s.relTarget} keeps its own work orders, customers and users.`},{icon:'icon-history',color:'#6b6d80',text:'You can roll back to the previous version at any time.'}],
+      doRelease:()=>{if(!s.changes.length){this.toast('Nothing to release yet');return;}this.setState(st=>{const vs=st.versions.map(x=>(x.env===st.relTarget?{...x,env:'Archived'}:x));vs.unshift({v:st.relVersion,env:st.relTarget,date:'Oct 6',by:'Maya Chen',items:st.changes.map(c=>({...c,time:''}))});const num=parseFloat(st.relVersion.replace(/[^0-9.]/g,''))||1.5;return {versions:vs,changes:[],aiSeen:0,relSel:st.relVersion,modal:null,relVersion:'v'+(num+0.1).toFixed(1),screen:'releases'};});this.toast(`${s.relVersion} released to ${s.relTarget}`);}});
+    // metadata
+    const node=s.metaNode;const nodes=[{g:'App'},{k:'app',label:'App settings',id:'app'},{g:'Pages'},...s.pages.map(p=>({k:'page:'+p.id,label:p.name,id:'pages.'+p.id,pad:'20px'})),{g:'Database'},...Object.keys(s.tables).map(k=>({k:'table:'+k,label:s.tables[k].name,id:'tables.'+s.tables[k].id,pad:'20px'})),{g:'Logic & access'},{k:'workflow',label:'Work order workflow',id:'workflows.work_order'},{k:'rules',label:'Validation rules',id:'validations'},{k:'roles',label:'Roles & visibility',id:'roles'},{k:'i18n',label:'Translations',id:'translations'}];
+    const cur=nodes.find(n=>n.k===node)||nodes[1];
+    const json=JSON.stringify(this.metaObj(cur.k),null,2).split('\n');
+    Object.assign(v,{metaNodes:nodes.map(n=>n.g?{isGroup:true,isItem:false,label:n.g}:Object.assign({isGroup:false,isItem:true,label:n.label,id:n.id,pad:n.pad||'10px',go:()=>this.setState({metaNode:n.k})},n.k===cur.k?{bg:'#eef0ff',fg:'#3f4bd8'}:{bg:'transparent',fg:'#17182a'})),
+      metaPath:cur.id,metaLabel:cur.label,metaCanOpen:cur.k.startsWith('page:')||cur.k.startsWith('table:'),
+      metaOpen:()=>{if(cur.k.startsWith('page:'))this.go('editor',{pageId:cur.k.slice(5),sel:null});else this.go('data',{dataTable:cur.k.slice(6),dataTab:'fields'});},
+      metaLines:json.map((line,i)=>{const m=line.match(/^(\s*)("(?:[^"\\]|\\.)*")(:\s?)(.*)$/);const ind=m?m[1]:line.match(/^\s*/)[0];const val=m?m[4]:line.trim();return {n:i+1,ind,key:m?m[2]:'',sep:m?m[3]:'',val,vc:/^"/.test(val)?'#9fe0b5':/^(true|false|null|-?\d)/.test(val)?'#ffc98a':'#c9cbe0'};})});
+    // home
+    Object.assign(v,{homePrompt:s.homePrompt,onHomePrompt:e=>this.setState({homePrompt:e.target.value}),
+      homeExamples:['Field service work orders','Purchase approvals with budgets','Client onboarding portal','Equipment inspections'].map(l=>({label:l,go:()=>this.setState({homePrompt:l==='Field service work orders'?'An app for our field technicians to manage work orders, log hours and parts. Dispatchers assign jobs; customers can see their own jobs.':`An app for ${l.toLowerCase()} for our team.`})})),
+      openGenerate:()=>this.setState({modal:'generate'}),modalGenerate:s.modal==='generate',
+      genSections:[{title:'Pages',icon:'icon-layout-dashboard',items:['Dashboard','Work orders','Customers','Technicians']},{title:'Database',icon:'icon-database',items:['Work orders · 7 fields','Customers · 4 fields','Technicians · 4 fields','Parts used · 4 fields']},{title:'Roles',icon:'icon-users',items:['Admin — everything','Dispatcher — assigns jobs','Technician — works their jobs','Customer — sees own company’s jobs']},{title:'Workflow & rules',icon:'icon-workflow',items:['New → Scheduled → In progress → Waiting on parts → Done','Done work orders need hours logged']}],
+      createApp:()=>{const p=s.homePrompt.trim();this.setState(st=>({modal:null,screen:'editor',messages:p?[{role:'user',text:p},st.messages[1]]:st.messages}));this.toast('FieldOps is ready to edit');},
+      projectCount:s.projects.length+' apps',
+      projects:s.projects.map(p=>({name:p.name,desc:p.desc,status:p.status,edited:p.edited,tint:p.tint,accent:p.accent,tag:p.tag||'',hasTag:!!p.tag,stBg:p.status.startsWith('Live')?'#e5f6ec':'#f2f2f6',stFg:p.status.startsWith('Live')?'#1c7a45':'#6b6d80',open:()=>this.go('editor'),copy:()=>this.setState({modal:'copy',copySrc:p.id,copyFrom:p.name,copyName:p.name+' (copy)',copyRecords:false,copyUsers:false})})),
+      modalCopy:s.modal==='copy',copyFrom:s.copyFrom,copyName:s.copyName,onCopyName:e=>this.setState({copyName:e.target.value}),copyRecords:s.copyRecords,
+      copyRecordsText:'Off: the copy starts empty. '+((s.projects.find(p=>p.id===s.copySrc)||{}).records||'')+' stay in the original.',
+      toggleCopyRecords:()=>this.setState({copyRecords:!s.copyRecords}),toggleCopyUsers:()=>this.setState({copyUsers:!s.copyUsers}),
+      copyRecTrack:s.copyRecords?'#4f5bea':'#d6d7e2',copyRecKnob:s.copyRecords?'16px':'2px',copyUsrTrack:s.copyUsers?'#4f5bea':'#d6d7e2',copyUsrKnob:s.copyUsers?'16px':'2px',
+      copyCta:s.copyRecords?'Duplicate structure and records':'Duplicate structure only',
+      doCopy:()=>{const src=s.projects.find(p=>p.id===s.copySrc)||s.projects[0];this.setState(st=>({modal:null,projects:[...st.projects,{...src,id:'c'+Date.now(),name:st.copyName||src.name+' (copy)',status:'Draft',edited:'Just now',tag:st.copyRecords?'Copied structure and records':'Copied structure only · no records'}]}));this.toast(s.copyRecords?'App duplicated with records':'App structure duplicated — no records copied');}});
+    return v;
+  }
+}
+</script>
+</body>
+</html>

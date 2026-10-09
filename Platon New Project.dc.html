@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.469.0/font/lucide.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#17182a;background:#f5f5f8;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:inherit;color:inherit}
+a{color:#4f5bea;text-decoration:none}a:hover{color:#3540c9}
+[class^="icon-"],[class*=" icon-"]{font-size:16px;line-height:1}
+@keyframes pspin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column;overflow:hidden;background:#f5f5f8">
+
+<div style="height:60px;flex:none;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid #ececf2;background:#fff">
+  <button onClick="{{ goHome }}" title="All apps" style="width:30px;height:30px;border-radius:9px;background:#17182a;color:#fff;border:none;display:grid;place-items:center;font-weight:800;font-size:15px;cursor:pointer">P</button>
+  <div style="font-weight:700;font-size:15px">Platon AI Studio</div>
+  <div style="width:1px;height:20px;background:#e3e3ea"></div>
+  <div style="font-size:13.5px;color:#4a4c5e;font-weight:500;display:flex;align-items:center;gap:6px">Acme Facilities<i class="icon-chevron-right" style="font-size:13px;color:#9a9cab"></i><span style="color:#17182a;font-weight:600">{{ crumb }}</span></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+    <sc-if value="{{ isWizard }}" hint-placeholder-val="{{ false }}">
+      <span style="font-size:12.5px;color:#8a8c9c;display:flex;align-items:center;gap:6px"><i class="icon-cloud-check" style="font-size:14px"></i>Draft saved</span>
+      <button onClick="{{ goHome }}" style="height:34px;padding:0 12px;border-radius:9px;border:1px solid #e1e1ea;background:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="icon-x" style="font-size:14px"></i>Close</button>
+    </sc-if>
+    <div style="width:34px;height:34px;border-radius:50%;background:#ffe2d1;color:#9a4a1c;display:grid;place-items:center;font-size:12px;font-weight:700">MC</div>
+  </div>
+</div>
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;overflow:auto;background:#fafafc">
+  <div style="max-width:1080px;margin:0 auto;padding:48px 24px 72px">
+    <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:28px">
+      <div style="flex:1;min-width:260px">
+        <h1 style="margin:0 0 6px;font-size:30px;font-weight:800;letter-spacing:-.025em">Apps</h1>
+        <div style="font-size:14.5px;color:#6b6d80">Every app in Acme Facilities. Start a new one from a brief and your documents.</div>
+      </div>
+      <button onClick="{{ startWizard }}" style="height:40px;padding:0 16px;border-radius:10px;border:none;background:#4f5bea;color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#4350e0"><i class="icon-plus" style="font-size:16px"></i>New app</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px">
+      <div onClick="{{ startWizard }}" style="border:1.5px dashed #c9cce6;border-radius:14px;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;color:#3f4bd8;background:#fff" style-hover="background:#f6f7ff;border-color:#4f5bea">
+        <div style="width:44px;height:44px;border-radius:12px;background:#eef0ff;display:grid;place-items:center"><i class="icon-sparkles" style="font-size:20px"></i></div>
+        <div style="font-weight:700;font-size:15px">New app</div>
+        <div style="font-size:12.5px;color:#6b6d80;text-align:center;max-width:200px;line-height:1.45">Describe it, upload specs, answer a few questions.</div>
+      </div>
+      <sc-for list="{{ projects }}" as="p" hint-placeholder-count="3">
+        <div style="background:#fff;border:1px solid #e8e8ef;border-radius:14px;overflow:hidden;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(20,20,40,.08)">
+          <div style="height:120px;background:{{ p.tint }};padding:16px 20px 0;display:flex">
+            <div style="flex:1;background:#fff;border-radius:10px 10px 0 0;box-shadow:0 4px 14px rgba(20,20,40,.08);padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:6px;align-items:center"><div style="width:14px;height:14px;border-radius:4px;background:{{ p.accent }}"></div><div style="width:50px;height:6px;border-radius:3px;background:#e6e6ee"></div></div>
+              <div style="height:7px;border-radius:3px;background:#efeff4"></div>
+              <div style="height:7px;width:70%;border-radius:3px;background:#efeff4"></div>
+            </div>
+          </div>
+          <div style="padding:14px 18px 16px;display:flex;flex-direction:column;gap:5px">
+            <div style="font-weight:700;font-size:15px">{{ p.name }}</div>
+            <div style="font-size:13px;color:#6b6d80;line-height:1.45">{{ p.desc }}</div>
+            <div style="font-size:12px;color:#8a8c9c;margin-top:6px">{{ p.edited }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isWizard }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(200px,252px) minmax(0,1fr) minmax(270px,330px)">
+
+  <div style="border-right:1px solid #ececf2;background:#fff;display:flex;flex-direction:column;min-height:0">
+    <div style="padding:22px 20px 10px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9a9cab">New app</div>
+      <div style="font-size:17px;font-weight:750;margin-top:4px;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ appTitle }}</div>
+      <div style="height:4px;border-radius:2px;background:#efeff4;margin-top:14px;overflow:hidden"><div style="height:100%;width:{{ progressPct }};background:#4f5bea;border-radius:2px;transition:width .3s"></div></div>
+    </div>
+    <div style="flex:1;overflow:auto;padding:8px 10px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="7">
+        <div onClick="{{ s.go }}" style="display:flex;gap:12px;padding:10px;border-radius:10px;cursor:{{ s.cursor }};background:{{ s.bg }};opacity:{{ s.op }}" style-hover="background:#f5f5f8">
+          <div style="width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;background:{{ s.numBg }};color:{{ s.numFg }};border:1.5px solid {{ s.numBd }}">
+            <sc-if value="{{ s.done }}" hint-placeholder-val="{{ false }}"><i class="icon-check" style="font-size:13px"></i></sc-if>
+            <sc-if value="{{ s.notDone }}" hint-placeholder-val="{{ true }}">{{ s.n }}</sc-if>
+          </div>
+          <div style="min-width:0;padding-top:2px">
+            <div style="font-size:13.5px;font-weight:650;color:{{ s.fg }}">{{ s.title }}</div>
+            <div style="font-size:12px;color:#8a8c9c;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.sub }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:14px 20px;border-top:1px solid #efeff4;font-size:12px;color:#8a8c9c;line-height:1.5">Everything here becomes app metadata. You can change any of it later in Studio.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;min-height:0;background:#fafafc">
+    <div style="flex:1;overflow:auto">
+      <div style="max-width:740px;margin:0 auto;padding:36px 32px 40px">
+        <div style="font-size:12.5px;font-weight:650;color:#4f5bea">Step {{ stepNum }} of 7</div>
+        <h1 style="margin:6px 0 8px;font-size:27px;font-weight:800;letter-spacing:-.025em;text-wrap:balance">{{ stepTitle }}</h1>
+        <p style="margin:0 0 28px;font-size:14.5px;color:#6b6d80;line-height:1.55;text-wrap:pretty">{{ stepDesc }}</p>
+
+        <sc-if value="{{ isS0 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+              <label style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:650">App name</span><input value="{{ name }}" onChange="{{ onName }}" placeholder="e.g. FieldOps" style="height:40px;padding:0 12px;border:1px solid #dfdfe8;border-radius:10px;font-size:14px;outline:none;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></label>
+              <label style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:650">Category</span><select value="{{ category }}" onChange="{{ onCategory }}" style="height:40px;padding:0 10px;border:1px solid #dfdfe8;border-radius:10px;font-size:14px;outline:none;background:#fff"><option>Operations</option><option>Sales &amp; CRM</option><option>HR &amp; people</option><option>Finance</option><option>Customer portal</option><option>Other</option></select></label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:650">What is the app for?</span><span style="font-size:12.5px;color:#8a8c9c;margin-top:-3px">Who uses it, what problem it solves, what a good day looks like.</span><textarea value="{{ purpose }}" onChange="{{ onPurpose }}" rows="4" style="padding:12px;border:1px solid #dfdfe8;border-radius:10px;font-size:14px;line-height:1.55;outline:none;resize:vertical;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></textarea></label>
+            <label style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:650">Technical requirements <span style="font-weight:500;color:#8a8c9c">· optional</span></span><span style="font-size:12.5px;color:#8a8c9c;margin-top:-3px">Integrations, compliance, performance, devices, existing systems.</span><textarea value="{{ tech }}" onChange="{{ onTech }}" rows="3" style="padding:12px;border:1px solid #dfdfe8;border-radius:10px;font-size:14px;line-height:1.55;outline:none;resize:vertical;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></textarea></label>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:13px;font-weight:650">Documents</div>
+              <div onClick="{{ addFile }}" style="border:1.5px dashed #c9cce6;border-radius:12px;background:#fff;padding:20px;display:flex;align-items:center;gap:14px;cursor:pointer" style-hover="background:#f6f7ff;border-color:#4f5bea">
+                <div style="width:40px;height:40px;border-radius:10px;background:#eef0ff;color:#3f4bd8;display:grid;place-items:center;flex:none"><i class="icon-upload" style="font-size:18px"></i></div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:650">Drop files or click to upload</div><div style="font-size:12.5px;color:#8a8c9c;margin-top:2px">DOCX, PDF, XLSX, CSV, images, Markdown · up to 50 MB each</div></div>
+              </div>
+              <sc-for list="{{ files }}" as="f" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:1px solid #e8e8ef;border-radius:10px">
+                  <div style="width:34px;height:34px;border-radius:8px;display:grid;place-items:center;flex:none;background:{{ f.bg }};color:{{ f.fg }};font-size:10px;font-weight:800">{{ f.ext }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</div><div style="font-size:12px;color:#8a8c9c">{{ f.meta }}</div></div>
+                  <sc-if value="{{ f.parsing }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#4f5bea;font-weight:600"><i class="icon-loader" style="font-size:13px;animation:pspin 1s linear infinite"></i>Reading</span></sc-if>
+                  <sc-if value="{{ f.done }}" hint-placeholder-val="{{ true }}"><span style="display:flex;align-items:center;gap:5px;font-size:12px;color:#0e7c66;font-weight:600"><i class="icon-check" style="font-size:13px"></i>Read</span></sc-if>
+                  <button onClick="{{ f.remove }}" title="Remove" style="width:28px;height:28px;border-radius:7px;border:none;background:transparent;cursor:pointer;color:#8a8c9c;display:grid;place-items:center" style-hover="background:#f2f2f6"><i class="icon-x" style="font-size:14px"></i></button>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #efeff4">
+                <i class="icon-list-checks" style="font-size:16px;color:#4f5bea"></i>
+                <div style="font-size:14px;font-weight:700">Requirements</div>
+                <span style="font-size:12px;color:#8a8c9c">{{ reqCount }} · merged from your brief and documents</span>
+              </div>
+              <div style="padding:6px 8px">
+                <sc-for list="{{ reqs }}" as="r" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:8px" style-hover="background:#fafafc">
+                    <div onClick="{{ r.toggle }}" style="width:18px;height:18px;margin-top:1px;border-radius:5px;flex:none;cursor:pointer;display:grid;place-items:center;background:{{ r.boxBg }};border:1.5px solid {{ r.boxBd }};color:#fff"><sc-if value="{{ r.on }}" hint-placeholder-val="{{ true }}"><i class="icon-check" style="font-size:11px"></i></sc-if></div>
+                    <div style="flex:1;font-size:13.5px;line-height:1.5;color:{{ r.fg }};text-decoration:{{ r.deco }}">{{ r.text }}</div>
+                    <button onClick="{{ r.remove }}" title="Remove" style="width:24px;height:24px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:#a0a2b0;display:grid;place-items:center;flex:none" style-hover="background:#f2f2f6"><i class="icon-trash-2" style="font-size:13px"></i></button>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px;padding:10px 16px 14px;border-top:1px solid #efeff4">
+                <input value="{{ newReq }}" onChange="{{ onNewReq }}" onKeyDown="{{ onReqKey }}" placeholder="Add a requirement" style="flex:1;height:36px;padding:0 12px;border:1px solid #dfdfe8;border-radius:9px;font-size:13.5px;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff">
+                <button onClick="{{ addReq }}" style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #dfdfe8;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Add</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS1 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ questions }}" as="q" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid {{ q.bd }};border-radius:12px;padding:16px 18px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:11px;font-weight:700;background:{{ q.numBg }};color:{{ q.numFg }}">{{ q.n }}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:14.5px;font-weight:650;line-height:1.4">{{ q.q }}</div>
+                    <div style="font-size:12.5px;color:#8a8c9c;margin-top:3px;line-height:1.45">{{ q.why }}</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+                      <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="3">
+                        <button onClick="{{ o.pick }}" style="height:34px;padding:0 13px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;background:{{ o.bg }};border:1px solid {{ o.bd }};color:{{ o.fg }}"><sc-if value="{{ o.sel }}" hint-placeholder-val="{{ false }}"><i class="icon-check" style="font-size:13px"></i></sc-if>{{ o.label }}</button>
+                      </sc-for>
+                    </div>
+                    <div style="margin-top:8px;font-size:12px;color:#8a8c9c">{{ q.mode }}</div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+            <label style="display:flex;flex-direction:column;gap:7px;margin-top:6px"><span style="font-size:13px;font-weight:650">Anything else Platon should know?</span><textarea value="{{ extraNote }}" onChange="{{ onExtra }}" rows="3" placeholder="e.g. Jobs over $5,000 need a manager sign-off before invoicing." style="padding:12px;border:1px solid #dfdfe8;border-radius:10px;font-size:14px;line-height:1.55;outline:none;resize:vertical;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></textarea></label>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:24px;align-items:start">
+            <div style="display:flex;flex-direction:column;gap:22px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:13px;font-weight:650">Brand color</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+                  <sc-for list="{{ palettes }}" as="c" hint-placeholder-count="5">
+                    <div onClick="{{ c.pick }}" style="padding:10px;border-radius:10px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:10px;border:1.5px solid {{ c.bd }}">
+                      <div style="width:24px;height:24px;border-radius:7px;background:{{ c.color }};flex:none"></div>
+                      <div style="font-size:13px;font-weight:600">{{ c.name }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:13px;font-weight:650">Logo</div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px dashed #c9cce6;border-radius:10px;background:#fff">
+                  <div style="width:40px;height:40px;border-radius:9px;background:{{ brand }};color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none">{{ initial }}</div>
+                  <div style="flex:1;font-size:12.5px;color:#6b6d80;line-height:1.45">Using a letter mark. Upload SVG or PNG to replace it.</div>
+                  <button style="height:32px;padding:0 12px;border-radius:8px;border:1px solid #dfdfe8;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Upload</button>
+                </div>
+              </div>
+              <sc-for list="{{ themeSegs }}" as="g" hint-placeholder-count="4">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:13px;font-weight:650">{{ g.label }}</div>
+                  <div style="display:flex;gap:2px;background:#f0f0f5;padding:3px;border-radius:10px;width:fit-content;max-width:100%;flex-wrap:wrap">
+                    <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.pick }}" style="height:30px;padding:0 14px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="position:sticky;top:0;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:12px;font-weight:650;color:#8a8c9c">Preview</div>
+              <div style="border-radius:14px;overflow:hidden;border:1px solid #e3e3ea;background:{{ pvBg }};box-shadow:0 10px 30px rgba(20,20,40,.08)">
+                <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid {{ pvLine }}">
+                  <div style="width:22px;height:22px;border-radius:6px;background:{{ brand }};color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800">{{ initial }}</div>
+                  <div style="font-size:13px;font-weight:700;color:{{ pvFg }}">{{ appTitle }}</div>
+                </div>
+                <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:15px;font-weight:750;color:{{ pvFg }};font-family:{{ pvFont }}">Today’s jobs</div>
+                  <div style="padding:{{ pvPad }};border-radius:{{ pvRadius }};background:{{ pvCard }};border:1px solid {{ pvLine }};display:flex;flex-direction:column;gap:4px">
+                    <div style="font-size:12.5px;font-weight:650;color:{{ pvFg }};font-family:{{ pvFont }}">HVAC inspection · Unit 4B</div>
+                    <div style="font-size:11.5px;color:{{ pvMuted }}">09:30 · Riverside Plaza</div>
+                  </div>
+                  <div style="padding:{{ pvPad }};border-radius:{{ pvRadius }};background:{{ pvCard }};border:1px solid {{ pvLine }};display:flex;flex-direction:column;gap:4px">
+                    <div style="font-size:12.5px;font-weight:650;color:{{ pvFg }};font-family:{{ pvFont }}">Replace filter · Lobby</div>
+                    <div style="font-size:11.5px;color:{{ pvMuted }}">13:00 · North Tower</div>
+                  </div>
+                  <div style="height:34px;border-radius:{{ pvRadius }};background:{{ brand }};color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:700">Start next job</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 90px 90px;gap:10px;padding:10px 16px;border-bottom:1px solid #efeff4;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#9a9cab"><span></span><span>Language</span><span>Direction</span><span>Default</span></div>
+              <sc-for list="{{ langs }}" as="l" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:36px minmax(0,1fr) 90px 90px;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid #f3f3f7;background:{{ l.rowBg }}">
+                  <div onClick="{{ l.toggle }}" style="width:18px;height:18px;border-radius:5px;cursor:pointer;display:grid;place-items:center;color:#fff;background:{{ l.boxBg }};border:1.5px solid {{ l.boxBd }}"><sc-if value="{{ l.on }}" hint-placeholder-val="{{ false }}"><i class="icon-check" style="font-size:11px"></i></sc-if></div>
+                  <div style="min-width:0"><div style="font-size:13.5px;font-weight:600">{{ l.name }}</div><div style="font-size:12px;color:#8a8c9c">{{ l.native }} · {{ l.code }}</div></div>
+                  <div style="font-size:12.5px;color:#6b6d80">{{ l.dir }}</div>
+                  <div><sc-if value="{{ l.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ l.makeDef }}" style="height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:650;cursor:pointer;background:{{ l.defBg }};color:{{ l.defFg }};border:1px solid {{ l.defBd }}">{{ l.defLabel }}</button></sc-if></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e8e8ef;border-radius:12px;padding:14px 16px">
+              <div style="flex:1"><div style="font-size:14px;font-weight:650">Translate with AI</div><div style="font-size:12.5px;color:#8a8c9c;margin-top:2px">Platon drafts every label in the other languages. Review them later in Project settings → Translations.</div></div>
+              <div onClick="{{ toggleAutoTr }}" style="width:38px;height:22px;border-radius:999px;padding:2px;cursor:pointer;flex:none;background:{{ trTrack }};display:flex;justify-content:{{ trJustify }}"><div style="width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:26px">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:15px;font-weight:700">App roles</div><div style="font-size:12.5px;color:#8a8c9c">People who will use the app. Drafted from your interview answers.</div></div>
+              <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+                <sc-for list="{{ roles }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #f3f3f7">
+                    <div style="width:32px;height:32px;border-radius:9px;background:#f2f2f6;color:#4a4c5e;display:grid;place-items:center;flex:none"><i class="icon-{{ r.icon }}" style="font-size:15px"></i></div>
+                    <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:650">{{ r.name }}</div><div style="font-size:12.5px;color:#8a8c9c">{{ r.desc }}</div></div>
+                    <button onClick="{{ r.remove }}" title="Remove role" style="width:28px;height:28px;border:none;background:transparent;border-radius:7px;cursor:pointer;color:#a0a2b0;display:grid;place-items:center" style-hover="background:#f2f2f6"><i class="icon-trash-2" style="font-size:14px"></i></button>
+                  </div>
+                </sc-for>
+                <div style="display:flex;gap:8px;padding:10px 16px 12px">
+                  <input value="{{ newRole }}" onChange="{{ onNewRole }}" onKeyDown="{{ onRoleKey }}" placeholder="Add a role, e.g. Auditor" style="flex:1;height:36px;padding:0 12px;border:1px solid #dfdfe8;border-radius:9px;font-size:13.5px;outline:none" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff">
+                  <button onClick="{{ addRole }}" style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #dfdfe8;background:#fff;font-size:13px;font-weight:600;cursor:pointer">Add</button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div style="font-size:15px;font-weight:700">Studio team</div><div style="font-size:12.5px;color:#8a8c9c">Who builds this app. Members registered in Acme Facilities.</div></div>
+              <div style="position:relative"><i class="icon-search" style="position:absolute;left:12px;top:11px;font-size:14px;color:#9a9cab;pointer-events:none"></i><input value="{{ memberQuery }}" onChange="{{ onMemberQuery }}" placeholder="Search members by name or email" style="width:100%;height:36px;padding:0 12px 0 34px;border:1px solid #dfdfe8;border-radius:9px;font-size:13.5px;outline:none;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></div>
+              <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+                <sc-for list="{{ members }}" as="m" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #f3f3f7">
+                    <div style="width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;flex:none;background:{{ m.avBg }};color:{{ m.avFg }}">{{ m.ini }}</div>
+                    <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">{{ m.name }}</div><div style="font-size:12px;color:#8a8c9c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.email }}</div></div>
+                    <sc-if value="{{ m.added }}" hint-placeholder-val="{{ false }}">
+                      <select value="{{ m.role }}" onChange="{{ m.onRole }}" disabled="{{ m.you }}" style="height:32px;padding:0 8px;border:1px solid #dfdfe8;border-radius:8px;font-size:12.5px;background:#fff;outline:none"><option>Owner</option><option>Editor</option><option>Viewer</option></select>
+                    </sc-if>
+                    <sc-if value="{{ m.canToggle }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ m.toggle }}" style="height:32px;min-width:72px;padding:0 12px;border-radius:8px;font-size:12.5px;font-weight:650;cursor:pointer;background:{{ m.btnBg }};color:{{ m.btnFg }};border:1px solid {{ m.btnBd }}">{{ m.btnLabel }}</button>
+                    </sc-if>
+                    <sc-if value="{{ m.you }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#8a8c9c;min-width:72px;text-align:center">You</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS5 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:26px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:15px;font-weight:700">Database</div>
+              <div style="display:flex;gap:2px;background:#f0f0f5;padding:3px;border-radius:10px;width:fit-content">
+                <sc-for list="{{ dbModes }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="height:30px;padding:0 14px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:8px">
+                <sc-for list="{{ engines }}" as="e" hint-placeholder-count="5">
+                  <div onClick="{{ e.pick }}" style="padding:14px 10px;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;border:1.5px solid {{ e.bd }}">
+                    <div style="width:30px;height:30px;background-image:url({{ e.logo }});background-size:contain;background-repeat:no-repeat;background-position:center"></div>
+                    <div style="font-size:13px;font-weight:650">{{ e.label }}</div>
+                    <div style="font-size:11.5px;color:#8a8c9c">{{ e.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ dbExisting }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;padding:16px;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;font-weight:650">Host</span><input placeholder="db.acme.internal" style="height:36px;padding:0 10px;border:1px solid #dfdfe8;border-radius:9px;font-size:13px;outline:none"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;font-weight:650">Port</span><input value="{{ dbPort }}" readOnly="{{ true }}" style="height:36px;padding:0 10px;border:1px solid #dfdfe8;border-radius:9px;font-size:13px;outline:none;font-family:'JetBrains Mono',monospace"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;font-weight:650">User</span><input placeholder="platon_app" style="height:36px;padding:0 10px;border:1px solid #dfdfe8;border-radius:9px;font-size:13px;outline:none"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;font-weight:650">Password</span><input type="password" placeholder="••••••••" style="height:36px;padding:0 10px;border:1px solid #dfdfe8;border-radius:9px;font-size:13px;outline:none"></label>
+                  <button style="grid-column:1 / -1;justify-self:start;height:34px;padding:0 14px;border-radius:9px;border:1px solid #dfdfe8;background:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="icon-plug-zap" style="font-size:14px"></i>Test connection</button>
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e8e8ef;border-radius:12px;padding:14px 16px">
+                <div style="flex:1"><div style="font-size:14px;font-weight:650">Generate sample data</div><div style="font-size:12.5px;color:#8a8c9c;margin-top:2px">Realistic test records for each table so pages aren’t empty in Development.</div></div>
+                <div onClick="{{ toggleSample }}" style="width:38px;height:22px;border-radius:999px;padding:2px;cursor:pointer;flex:none;background:{{ smTrack }};display:flex;justify-content:{{ smJustify }}"><div style="width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:15px;font-weight:700">File storage</div>
+              <sc-for list="{{ storages }}" as="s" hint-placeholder-count="2">
+                <div onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;cursor:pointer;border:1.5px solid {{ s.bd }}">
+                  <div style="width:18px;height:18px;border-radius:50%;flex:none;border:1.5px solid {{ s.dotBd }};display:grid;place-items:center"><div style="width:8px;height:8px;border-radius:50%;background:{{ s.dot }}"></div></div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:650">{{ s.title }}</div><div style="font-size:12.5px;color:#8a8c9c;margin-top:2px">{{ s.desc }}</div></div>
+                </div>
+              </sc-for>
+              <label style="display:flex;flex-direction:column;gap:6px;max-width:360px"><span style="font-size:12.5px;font-weight:650">Bucket name</span><input value="{{ bucket }}" onChange="{{ onBucket }}" style="height:36px;padding:0 10px;border:1px solid #dfdfe8;border-radius:9px;font-size:13px;outline:none;font-family:'JetBrains Mono',monospace;background:#fff" style-focus="border-color:#4f5bea;box-shadow:0 0 0 3px #eef0ff"></label>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isS6 }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ genIdle }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden">
+              <sc-for list="{{ summary }}" as="r" hint-placeholder-count="6">
+                <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-bottom:1px solid #f3f3f7">
+                  <div style="width:130px;flex:none;font-size:12.5px;font-weight:650;color:#6b6d80;padding-top:1px">{{ r.label }}</div>
+                  <div style="flex:1;min-width:0;font-size:13.5px;line-height:1.5">{{ r.value }}</div>
+                  <button onClick="{{ r.edit }}" style="border:none;background:transparent;color:#4f5bea;font-size:12.5px;font-weight:650;cursor:pointer;padding:0">Edit</button>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ startGen }}" style="margin-top:20px;height:44px;padding:0 20px;border-radius:11px;border:none;background:#4f5bea;color:#fff;font-weight:700;font-size:14.5px;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#4350e0"><i class="icon-sparkles" style="font-size:16px"></i>Generate app</button>
+          </sc-if>
+          <sc-if value="{{ genRunning }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #e8e8ef;border-radius:12px;padding:8px 6px">
+              <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="8">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;opacity:{{ t.op }}">
+                  <div style="width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;background:{{ t.bg }};color:{{ t.fg }}">
+                    <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><i class="icon-check" style="font-size:13px"></i></sc-if>
+                    <sc-if value="{{ t.active }}" hint-placeholder-val="{{ false }}"><i class="icon-loader" style="font-size:13px;animation:pspin 1s linear infinite"></i></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">{{ t.label }}</div><div style="font-size:12px;color:#8a8c9c">{{ t.detail }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ genDone }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 18px;border-radius:12px;background:#e9f7f1;border:1px solid #c5ebdb">
+                <i class="icon-party-popper" style="font-size:20px;color:#0e7c66"></i>
+                <div style="flex:1;min-width:200px"><div style="font-size:14.5px;font-weight:700;color:#0b5e4e">{{ appTitle }} is ready in Development</div><div style="font-size:12.5px;color:#2f6f60;margin-top:2px">Invites sent. Keep shaping it visually or with the AI.</div></div>
+                <a href="Platon Studio v3.dc.html" style="height:40px;padding:0 16px;border-radius:10px;background:#17182a;color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px">Open in Studio<i class="icon-arrow-right" style="font-size:15px"></i></a>
+              </div>
+            </sc-if>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <sc-if value="{{ showFooter }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:none;border-top:1px solid #ececf2;background:#fff;padding:12px 32px;display:flex;align-items:center;gap:10px">
+        <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" style="height:38px;padding:0 14px;border-radius:10px;border:1px solid #dfdfe8;background:#fff;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px"><i class="icon-arrow-left" style="font-size:15px"></i>Back</button></sc-if>
+        <div style="margin-left:auto;font-size:12.5px;color:#b0485a">{{ blockMsg }}</div>
+        <button onClick="{{ next }}" style="height:38px;padding:0 16px;border-radius:10px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;background:{{ nextBg }};color:#fff">{{ nextLabel }}<i class="icon-arrow-right" style="font-size:15px"></i></button>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="border-left:1px solid #ececf2;background:#fff;display:flex;flex-direction:column;min-height:0">
+    <div style="height:52px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid #efeff4">
+      <div style="width:26px;height:26px;border-radius:8px;background:#eef0ff;color:#3f4bd8;display:grid;place-items:center"><i class="icon-sparkles" style="font-size:14px"></i></div>
+      <div style="font-size:14px;font-weight:700">Platon AI</div>
+      <span style="margin-left:auto;font-size:11.5px;color:#8a8c9c">Draft blueprint</span>
+    </div>
+    <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:12px;background:#fafafc;border:1px solid #efeff4">
+        <sc-for list="{{ blueprint }}" as="b" hint-placeholder-count="3">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#4a4c5e"><i class="icon-{{ b.icon }}" style="font-size:13px"></i>{{ b.label }}<span style="margin-left:auto;color:#8a8c9c;font-weight:600">{{ b.count }}</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:7px">
+              <sc-for list="{{ b.items }}" as="it" hint-placeholder-count="4"><span style="height:22px;padding:0 8px;border-radius:6px;background:#fff;border:1px solid #e6e6ee;font-size:11.5px;font-weight:600;color:#4a4c5e;display:inline-flex;align-items:center">{{ it }}</span></sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-for list="{{ chat }}" as="c" hint-placeholder-count="2">
+        <div style="display:flex;justify-content:{{ c.justify }}">
+          <div style="max-width:92%;padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.55;background:{{ c.bg }};color:{{ c.fg }};text-wrap:pretty">{{ c.text }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:12px;border-top:1px solid #efeff4">
+      <div style="border:1px solid #dfdfe8;border-radius:12px;padding:8px 8px 8px 12px;display:flex;align-items:flex-end;gap:8px">
+        <textarea value="{{ draft }}" onChange="{{ onDraft }}" onKeyDown="{{ onDraftKey }}" rows="2" placeholder="Tell Platon more, or ask why…" style="flex:1;border:none;outline:none;resize:none;font-size:13px;line-height:1.5;background:transparent"></textarea>
+        <button onClick="{{ send }}" style="width:32px;height:32px;border-radius:9px;border:none;background:#4f5bea;color:#fff;cursor:pointer;display:grid;place-items:center;flex:none"><i class="icon-arrow-up" style="font-size:15px"></i></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STEPS=[
+ {t:'Describe',d:'Start with the purpose and any documents you already have. Platon reads them and merges everything into one requirements list.',title:'What are you building?'},
+ {t:'AI interview',d:'Platon found a few gaps in the brief. Answer what you can — skipped questions get sensible defaults.',title:'A few questions from Platon'},
+ {t:'Theme & branding',d:'Pick a starting look. Every page uses these tokens, so changing them later restyles the whole app.',title:'How should it look?'},
+ {t:'Languages',d:'Choose the languages your users need. The default language is used for new labels and as the fallback.',title:'Which languages?'},
+ {t:'Team & roles',d:'App roles control what end users can see and do. Studio members are the people who build the app with you.',title:'Who uses it, who builds it?'},
+ {t:'Database & storage',d:'Where the app keeps its records and files. Development resources are created now; Staging and Production at first release.',title:'Where does data live?'},
+ {t:'Generate',d:'Check the summary, then Platon creates the pages, data model, roles, theme and translations.',title:'Review and generate'}];
+const LOGO=n=>'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/'+n+'.svg';
+const ENG=[{id:'postgres',l:'PostgreSQL',logo:LOGO('postgresql/postgresql-original'),note:'Recommended',port:'5432'},{id:'mysql',l:'MySQL',logo:LOGO('mysql/mysql-original'),note:'Relational',port:'3306'},{id:'mssql',l:'SQL Server',logo:LOGO('microsoftsqlserver/microsoftsqlserver-original'),note:'Relational',port:'1433'},{id:'mongo',l:'MongoDB',logo:LOGO('mongodb/mongodb-original'),note:'Documents',port:'27017'},{id:'redis',l:'Redis',logo:LOGO('redis/redis-original'),note:'Cache only',port:'6379'}];
+const PAL=[{n:'Indigo',c:'#4f5bea'},{n:'Graphite',c:'#2a2c3f'},{n:'Forest',c:'#0e7c66'},{n:'Ember',c:'#d9541e'},{n:'Ocean',c:'#0a7bbf'},{n:'Plum',c:'#8a3fb8'}];
+const LANGS=[{c:'en',n:'English',x:'English'},{c:'uz',n:'Uzbek',x:'Oʻzbekcha'},{c:'ru',n:'Russian',x:'Русский'},{c:'kk',n:'Kazakh',x:'Қазақша'},{c:'tr',n:'Turkish',x:'Türkçe'},{c:'de',n:'German',x:'Deutsch'},{c:'es',n:'Spanish',x:'Español'},{c:'ar',n:'Arabic',x:'العربية',rtl:1}];
+const MEMBERS=[{id:'mc',n:'Maya Chen',e:'maya.chen@acme.com',bg:'#ffe2d1',fg:'#9a4a1c',you:1},{id:'dk',n:'Daniel Kim',e:'daniel.kim@acme.com',bg:'#dbeafe',fg:'#1e4fa8'},{id:'ar',n:'Aziz Rahimov',e:'aziz.r@acme.com',bg:'#e3f5ec',fg:'#0e6b52'},{id:'sl',n:'Sara Lopez',e:'sara.lopez@acme.com',bg:'#f3e3fb',fg:'#7a2fa3'},{id:'tb',n:'Tom Becker',e:'tom.becker@acme.com',bg:'#fdf1c7',fg:'#8a6400'},{id:'nk',n:'Nilufar Karimova',e:'nilufar.k@acme.com',bg:'#ffe0e6',fg:'#a3203f'}];
+const QS=[
+ {id:'users',q:'Who will use the app?',why:'Your spec mentions dispatchers and technicians. Customers appear once, in the portal section.',multi:1,opts:['Admins','Dispatchers','Technicians','Customers','Managers']},
+ {id:'offline',q:'Do technicians need to work without signal?',why:'Basements and plant rooms often have no coverage.',opts:['Full offline with sync','Read-only offline','Always online']},
+ {id:'login',q:'How do customers sign in?',why:'Determines the auth flow for the customer portal.',opts:['Email magic link','Password','Company SSO','No customer access']},
+ {id:'approve',q:'Who signs off a completed job?',why:'Adds an approval step to the job workflow.',opts:['Dispatcher','Manager','Customer signature','No sign-off']},
+ {id:'integr',q:'Which services should it connect to?',why:'Technical requirements list maps and SMS; ERP is mentioned in the PDF.',multi:1,opts:['Maps & routing','SMS','Email','Payments','ERP (REST)']},
+ {id:'device',q:'Main device for technicians?',why:'Sets the default canvas size and layout for their pages.',opts:['Phone','Tablet','Desktop','Mixed']}];
+const FILEPOOL=[{name:'Customer-portal-wireframes.png',ext:'PNG',bg:'#f3e3fb',fg:'#7a2fa3',size:'1.2 MB',reqs:['Customers can see the status and history of their own jobs only','Customers can request a new job with photos']},{name:'Parts-price-list.xlsx',ext:'XLS',bg:'#e3f5ec',fg:'#0e6b52',size:'84 KB',reqs:['Parts have a SKU, unit price and stock level per warehouse']}];
+const ROLE_ICON={Admins:'shield',Dispatchers:'route',Technicians:'wrench',Customers:'user',Managers:'briefcase'};
+const ROLE_DESC={Admins:'Full access, manages settings and users',Dispatchers:'Creates and assigns jobs, sees all schedules',Technicians:'Sees assigned jobs, logs time, parts and photos',Customers:'Sees only their own jobs and requests',Managers:'Approves jobs, sees reports'};
+let rid=100;
+class Component extends DCLogic {
+  state={view:'wizard',step:0,maxStep:0,name:'FieldOps',category:'Operations',
+    purpose:'Help our field technicians manage work orders on site: see today’s jobs, log hours and parts, attach photos. Dispatchers plan and assign jobs. Customers check progress of their own jobs.',
+    tech:'Works on phones in poor coverage. Address lookup and route to site. SMS when a technician is on the way. Export to our ERP nightly.',
+    files:[{id:1,name:'FieldOps-requirements-v2.docx',ext:'DOC',bg:'#dbeafe',fg:'#1e4fa8',size:'312 KB',pages:'14 pages',st:'done'},{id:2,name:'Current-process.pdf',ext:'PDF',bg:'#ffe0e6',fg:'#a3203f',size:'2.4 MB',pages:'22 pages',st:'done'}],
+    reqs:[
+     'Dispatchers create jobs with customer, site, priority, due date and assigned technician',
+     'Technicians see today’s jobs in route order on their phone',
+     'Technicians log start/stop time, parts used and before/after photos per job',
+     'Jobs move through New → Assigned → In progress → Waiting on parts → Done',
+     'Technicians can keep working offline and sync when back online',
+     'Send an SMS to the customer when the technician is on the way',
+     'Nightly export of completed jobs and parts to the ERP',
+     'Managers see weekly hours and first-time-fix rate per technician'].map(t=>({id:++rid,text:t,on:true})),
+    newReq:'',answers:{users:['Admins','Dispatchers','Technicians','Customers'],integr:['Maps & routing','SMS','ERP (REST)']},extraNote:'',
+    color:'#4f5bea',mode:'Light',radius:'Soft',density:'Comfortable',font:'Jakarta',
+    langs:{en:1,uz:1,ru:1},defLang:'en',autoTr:true,
+    roles:null,newRole:'',team:{mc:'Owner',dk:'Editor'},memberQuery:'',
+    engine:'postgres',dbMode:'new',sample:true,storage:'new',bucket:'fieldops-dev-files',
+    gen:-1,draft:'',chat:[],filePool:0};
+  componentWillUnmount(){clearInterval(this.iv);clearTimeout(this.ft)}
+  set(k){return e=>this.setState({[k]:e.target.value})}
+  getRoles(){const s=this.state;if(s.roles)return s.roles;return (s.answers.users||[]).map(u=>({name:u.replace(/s$/,''),icon:ROLE_ICON[u]||'user',desc:ROLE_DESC[u]||''}))}
+  go(i){if(i<=this.state.maxStep)this.setState({step:i})}
+  next(){const s=this.state;if(s.step===0&&(!s.name.trim()||!s.purpose.trim()))return;const n=Math.min(6,s.step+1);if(s.step===1&&!s.roles)this.setState({roles:this.getRoles()});this.setState({step:n,maxStep:Math.max(s.maxStep,n)})}
+  addFile(){const s=this.state;const src=FILEPOOL[s.filePool%FILEPOOL.length];const id=Date.now();
+    this.setState({files:[...s.files,{id,name:src.name,ext:src.ext,bg:src.bg,fg:src.fg,size:src.size,pages:'',st:'parsing'}],filePool:s.filePool+1});
+    this.ft=setTimeout(()=>this.setState(st=>({files:st.files.map(f=>f.id===id?{...f,st:'done',pages:src.ext==='PNG'?'1 image':'3 sheets'}:f),reqs:[...st.reqs,...src.reqs.map(t=>({id:++rid,text:t,on:true}))]})),1500)}
+  pick(q,o){this.setState(s=>{const a={...s.answers};if(q.multi){const cur=a[q.id]||[];a[q.id]=cur.includes(o)?cur.filter(x=>x!==o):[...cur,o]}else a[q.id]=a[q.id]===o?undefined:o;return {answers:a,roles:q.id==='users'?null:s.roles}})}
+  startGen(){this.setState({gen:0});this.iv=setInterval(()=>this.setState(s=>{if(s.gen>=this.taskList().length){clearInterval(this.iv);return null}return {gen:s.gen+1}}),750)}
+  taskList(){const s=this.state,roles=this.getRoles(),langs=Object.keys(s.langs).filter(k=>s.langs[k]),eng=ENG.find(e=>e.id===s.engine);const team=Object.keys(s.team).length;
+    return [['Reading requirements',s.reqs.filter(r=>r.on).length+' requirements, '+s.files.length+' documents'],['Designing data model','Job, Customer, Site, Technician, Part, TimeEntry, Photo'],['Creating pages','9 pages with navigation'],['Setting up roles & permissions',roles.map(r=>r.name).join(', ')],['Applying theme',PAL.find(p=>p.c===s.color).n+' · '+s.mode+' · '+s.radius+' corners'],['Translating labels',langs.length+' languages'+(s.autoTr?' · AI drafts':'')],['Provisioning '+eng.l,s.dbMode==='new'?'Development database'+(s.sample?' with sample data':''):'Connecting to existing database'],['Creating storage bucket',s.bucket],['Inviting team',(team-1)+' members invited']]}
+  send(){const t=this.state.draft.trim();if(!t)return;this.setState(s=>({draft:'',chat:[...s.chat,{role:'user',text:t},{role:'ai',text:'Noted — I’ve added that to the requirements and will reflect it in the blueprint.'}],reqs:[...s.reqs,{id:++rid,text:t,on:true}]}))}
+  renderVals(){
+    const s=this.state,roles=this.getRoles();
+    const seg=(opts,cur,k)=>opts.map(o=>({label:o,pick:()=>this.setState({[k]:o}),bg:o===cur?'#fff':'transparent',fg:o===cur?'#17182a':'#6b6d80',sh:o===cur?'0 1px 2px rgba(20,20,40,.12)':'none'}));
+    const langOn=LANGS.filter(l=>s.langs[l.c]);const teamN=Object.keys(s.team).length;const ansN=QS.filter(q=>{const a=s.answers[q.id];return Array.isArray(a)?a.length:a}).length;
+    const eng=ENG.find(e=>e.id===s.engine);const pal=PAL.find(p=>p.c===s.color);
+    const subs=[s.files.length+' files · '+s.reqs.filter(r=>r.on).length+' requirements',ansN+' of '+QS.length+' answered',pal.n+' · '+s.mode,langOn.length+' languages',roles.length+' roles · '+teamN+' members',eng.l+' · MinIO',s.gen>=this.taskList().length?'Done':'Not started'];
+    const dark=s.mode==='Dark';
+    const block=s.step===0&&(!s.name.trim()||!s.purpose.trim());
+    const aiMsg=['I read both documents. I merged 8 requirements; uncheck anything that’s out of scope.','From your answers I’m drafting '+roles.length+' roles. Offline mode adds a local sync queue to technician pages.','Brand color drives buttons, links and highlights. Dark mode is generated automatically.','Labels are written in '+(LANGS.find(l=>l.c===s.defLang)||{}).n+' first, then translated.','Roles come from the interview. Members get access to Studio, not to the app itself.',eng.l+' fits this app: jobs, parts and time entries are relational.','Everything below becomes editable metadata. Nothing is deployed outside Development.'][s.step];
+    return {
+      isHome:s.view==='home',isWizard:s.view==='wizard',crumb:s.view==='home'?'Apps':'New app',
+      goHome:()=>this.setState({view:'home'}),startWizard:()=>this.setState({view:'wizard',step:0}),
+      projects:[{name:'FieldOps',desc:'Work orders for field technicians',edited:'Edited 2 h ago',tint:'#eef0ff',accent:'#4f5bea'},{name:'Asset Registry',desc:'Track equipment across sites',edited:'Edited yesterday',tint:'#e9f7f1',accent:'#0e7c66'},{name:'Visitor Desk',desc:'Front desk check-in for buildings',edited:'Edited Sep 28',tint:'#fff1e8',accent:'#d9541e'}],
+      appTitle:s.name.trim()||'Untitled app',initial:(s.name.trim()||'A')[0].toUpperCase(),progressPct:Math.round((s.maxStep+(s.gen>=this.taskList().length?1:0))/7*100)+'%',
+      steps:STEPS.map((st,i)=>{const cur=i===s.step,done=i<s.maxStep||(i===6&&s.gen>=this.taskList().length);const reach=i<=s.maxStep;return {n:i+1,title:st.t,sub:reach?subs[i]:'—',go:()=>this.go(i),bg:cur?'#f2f3ff':'transparent',fg:cur?'#2c36b8':'#17182a',cursor:reach?'pointer':'default',op:reach?1:.55,done:done&&!cur,notDone:!(done&&!cur),numBg:cur?'#4f5bea':done?'#e9f7f1':'#fff',numFg:cur?'#fff':done?'#0e7c66':'#8a8c9c',numBd:cur?'#4f5bea':done?'#c5ebdb':'#dfdfe8'}}),
+      stepNum:s.step+1,stepTitle:STEPS[s.step].title,stepDesc:STEPS[s.step].d,
+      isS0:s.step===0,isS1:s.step===1,isS2:s.step===2,isS3:s.step===3,isS4:s.step===4,isS5:s.step===5,isS6:s.step===6,
+      name:s.name,onName:this.set('name'),category:s.category,onCategory:this.set('category'),purpose:s.purpose,onPurpose:this.set('purpose'),tech:s.tech,onTech:this.set('tech'),
+      addFile:()=>this.addFile(),
+      files:s.files.map(f=>({...f,meta:f.size+(f.pages?' · '+f.pages:''),parsing:f.st==='parsing',done:f.st==='done',remove:()=>this.setState(st=>({files:st.files.filter(x=>x.id!==f.id)}))})),
+      reqCount:s.reqs.filter(r=>r.on).length+' of '+s.reqs.length,
+      reqs:s.reqs.map(r=>({text:r.text,on:r.on,toggle:()=>this.setState(st=>({reqs:st.reqs.map(x=>x.id===r.id?{...x,on:!x.on}:x)})),remove:()=>this.setState(st=>({reqs:st.reqs.filter(x=>x.id!==r.id)})),boxBg:r.on?'#4f5bea':'#fff',boxBd:r.on?'#4f5bea':'#cfd0dc',fg:r.on?'#17182a':'#9a9cab',deco:r.on?'none':'line-through'})),
+      newReq:s.newReq,onNewReq:this.set('newReq'),addReq:()=>{const t=s.newReq.trim();if(t)this.setState({reqs:[...s.reqs,{id:++rid,text:t,on:true}],newReq:''})},onReqKey:e=>{if(e.key==='Enter'){const t=s.newReq.trim();if(t)this.setState({reqs:[...s.reqs,{id:++rid,text:t,on:true}],newReq:''})}},
+      questions:QS.map((q,i)=>{const a=s.answers[q.id];const has=Array.isArray(a)?a.length>0:!!a;return {n:i+1,q:q.q,why:q.why,mode:q.multi?'Pick any':'Pick one',bd:has?'#d6d9fb':'#e8e8ef',numBg:has?'#4f5bea':'#f0f0f5',numFg:has?'#fff':'#6b6d80',opts:q.opts.map(o=>{const sel=Array.isArray(a)?a.includes(o):a===o;return {label:o,sel,pick:()=>this.pick(q,o),bg:sel?'#eef0ff':'#fff',bd:sel?'#4f5bea':'#dfdfe8',fg:sel?'#2c36b8':'#4a4c5e'}})}}),
+      extraNote:s.extraNote,onExtra:this.set('extraNote'),
+      palettes:PAL.map(p=>({name:p.n,color:p.c,bd:p.c===s.color?p.c:'#e6e6ee',pick:()=>this.setState({color:p.c})})),
+      themeSegs:[{label:'Mode',opts:seg(['Light','Dark','System'],s.mode,'mode')},{label:'Corners',opts:seg(['Sharp','Soft','Round'],s.radius,'radius')},{label:'Density',opts:seg(['Compact','Comfortable'],s.density,'density')},{label:'Font',opts:seg(['Jakarta','IBM Plex','System'],s.font,'font')}],
+      brand:s.color,pvBg:dark?'#16171f':'#f7f7fa',pvCard:dark?'#22232e':'#fff',pvFg:dark?'#f1f1f6':'#17182a',pvMuted:dark?'#9a9cab':'#8a8c9c',pvLine:dark?'#2e2f3c':'#ececf2',pvRadius:{Sharp:'3px',Soft:'9px',Round:'16px'}[s.radius],pvPad:s.density==='Compact'?'8px 10px':'12px 12px',pvFont:{Jakarta:"'Plus Jakarta Sans'",'IBM Plex':"'IBM Plex Sans',sans-serif",System:'system-ui'}[s.font],
+      langs:LANGS.map(l=>{const on=!!s.langs[l.c],def=s.defLang===l.c;return {name:l.n,native:l.x,code:l.c,dir:l.rtl?'Right-to-left':'Left-to-right',on,rowBg:on?'#fff':'#fcfcfd',boxBg:on?'#4f5bea':'#fff',boxBd:on?'#4f5bea':'#cfd0dc',
+        toggle:()=>{if(def)return;this.setState(st=>({langs:{...st.langs,[l.c]:!on}}))},makeDef:()=>this.setState({defLang:l.c}),defLabel:def?'Default':'Set default',defBg:def?'#eef0ff':'#fff',defFg:def?'#2c36b8':'#6b6d80',defBd:def?'#c7ccff':'#e1e1ea'}}),
+      toggleAutoTr:()=>this.setState({autoTr:!s.autoTr}),trTrack:s.autoTr?'#4f5bea':'#d5d6e0',trJustify:s.autoTr?'flex-end':'flex-start',
+      roles:roles.map((r,i)=>({...r,remove:()=>this.setState({roles:roles.filter((_,j)=>j!==i)})})),
+      newRole:s.newRole,onNewRole:this.set('newRole'),addRole:()=>{const t=s.newRole.trim();if(t)this.setState({roles:[...roles,{name:t,icon:'user',desc:'Custom role · set permissions in Studio'}],newRole:''})},onRoleKey:e=>{if(e.key==='Enter'){const t=s.newRole.trim();if(t)this.setState({roles:[...roles,{name:t,icon:'user',desc:'Custom role · set permissions in Studio'}],newRole:''})}},
+      memberQuery:s.memberQuery,onMemberQuery:this.set('memberQuery'),
+      members:MEMBERS.filter(m=>(m.n+m.e).toLowerCase().includes(s.memberQuery.toLowerCase())).map(m=>{const added=!!s.team[m.id];return {name:m.n,email:m.e,ini:m.n.split(' ').map(x=>x[0]).join(''),avBg:m.bg,avFg:m.fg,added,role:s.team[m.id]||'Editor',you:!!m.you,canToggle:!m.you,
+        onRole:e=>this.setState({team:{...s.team,[m.id]:e.target.value}}),toggle:()=>{const t={...s.team};if(added)delete t[m.id];else t[m.id]='Editor';this.setState({team:t})},btnLabel:added?'Remove':'Add',btnBg:added?'#fff':'#17182a',btnFg:added?'#6b6d80':'#fff',btnBd:added?'#e1e1ea':'#17182a'}}),
+      dbModes:seg(['Create new','Connect existing'],s.dbMode==='new'?'Create new':'Connect existing','_x').map(o=>({...o,pick:()=>this.setState({dbMode:o.label==='Create new'?'new':'existing'})})),
+      engines:ENG.map(e=>({label:e.l,logo:e.logo,note:e.note,bd:e.id===s.engine?'#4f5bea':'#e6e6ee',pick:()=>this.setState({engine:e.id})})),
+      dbExisting:s.dbMode==='existing',dbPort:eng.port,
+      toggleSample:()=>this.setState({sample:!s.sample}),smTrack:s.sample?'#4f5bea':'#d5d6e0',smJustify:s.sample?'flex-end':'flex-start',
+      storages:[{id:'new',title:'New bucket in Platon Storage',desc:'MinIO bucket per environment with its own access keys'},{id:'ex',title:'Use existing storage: acme-shared (MinIO)',desc:'3 buckets · 18.4 GB of 100 GB used'}].map(o=>({...o,bd:s.storage===o.id?'#4f5bea':'#e6e6ee',dot:s.storage===o.id?'#4f5bea':'transparent',dotBd:s.storage===o.id?'#4f5bea':'#cfd0dc',pick:()=>this.setState({storage:o.id})})),
+      bucket:s.bucket,onBucket:this.set('bucket'),
+      summary:[['App',(s.name||'Untitled')+' · '+s.category,0],['Requirements',s.reqs.filter(r=>r.on).length+' requirements from '+s.files.length+' documents',0],['Interview',ansN+' of '+QS.length+' questions answered',1],['Theme',pal.n+', '+s.mode+', '+s.radius+' corners, '+s.density+', '+s.font,2],['Languages',langOn.map(l=>l.n+(l.c===s.defLang?' (default)':'')).join(', ')+(s.autoTr?' · AI translation':''),3],['Roles',roles.map(r=>r.name).join(', '),4],['Team',MEMBERS.filter(m=>s.team[m.id]).map(m=>m.n.split(' ')[0]+' ('+s.team[m.id]+')').join(', '),4],['Database',eng.l+' · '+(s.dbMode==='new'?'new':'existing')+(s.sample?' · sample data':''),5],['Storage',(s.storage==='new'?'New MinIO bucket ':'acme-shared · ')+s.bucket,5]].map(([label,value,st])=>({label,value,edit:()=>this.setState({step:st})})),
+      genIdle:s.gen<0,genRunning:s.gen>=0,genDone:s.gen>=this.taskList().length,startGen:()=>this.startGen(),
+      tasks:this.taskList().map(([label,detail],i)=>{const done=i<s.gen,active=i===s.gen;return {label,detail,done,active,op:i<=s.gen?1:.45,bg:done?'#e9f7f1':active?'#eef0ff':'#f2f2f6',fg:done?'#0e7c66':'#4f5bea'}}),
+      showFooter:s.step<6,canBack:s.step>0,back:()=>this.setState({step:s.step-1}),next:()=>this.next(),nextLabel:s.step===5?'Review':'Continue',nextBg:block?'#b9bdf3':'#4f5bea',blockMsg:block?'Add a name and purpose to continue':'',
+      blueprint:[{label:'Pages',icon:'layout-panel-left',count:'9',items:['Dashboard','Jobs','Job detail','Schedule','Map','Customers','Parts','Reports','Settings']},{label:'Roles',icon:'shield',count:String(roles.length),items:roles.map(r=>r.name)},{label:'Data',icon:'database',count:'7 tables',items:['Job','Customer','Site','Technician','Part','TimeEntry','Photo']}],
+      chat:[{role:'ai',text:aiMsg},...s.chat].map(c=>({text:c.text,justify:c.role==='user'?'flex-end':'flex-start',bg:c.role==='user'?'#4f5bea':'#f3f3f7',fg:c.role==='user'?'#fff':'#17182a'})),
+      draft:s.draft,onDraft:this.set('draft'),send:()=>this.send(),onDraftKey:e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();this.send()}}
+    };
+  }
+}
+</script>
+</body>
+</html>
